@@ -1095,7 +1095,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
 
     ws.onerror = (error) => {
       console.error('WebSocket xatosi:', error);
-      alert('Xabar yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+      // alert('Xabar yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
     };
 
     return true;
@@ -1146,7 +1146,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
       
     } catch (error) {
       console.error('Error submitting offer:', error);
-      alert('Taklif yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+      // alert('Taklif yuborishda xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
     } finally {
       setIsSubmitting(false);
     }
@@ -1205,7 +1205,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
   return (
     <div className={`min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 ${isMapFullscreen ? 'overflow-hidden' : ''}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm px-4 py-4">
+      <div className="bg-white border-b mx-4 rounded-xl border-gray-200 shadow-sm px-4 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -1564,7 +1564,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
                     </div>
                     <div className="mt-3 flex items-center space-x-2">
                       <button 
-                        onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
+                       
                         className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full hover:bg-blue-200 transition-colors flex items-center"
                       >
                         <FaMessage className="mr-1" /> Chat
@@ -1808,7 +1808,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
                 Orqaga qaytish
               </button>
               <button 
-                onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
+                
                 className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all flex-1 flex items-center justify-center"
               >
                 <FaComments className="mr-2" />

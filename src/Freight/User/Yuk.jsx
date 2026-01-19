@@ -19,9 +19,6 @@ import {
   PieChart, Pie, Cell
 } from 'recharts';
 
-// Token olish funksiyasi
-const getAuthToken = async () => localStorage.getItem('token');
-
 // Dropdown komponenti
 const Dropdown = ({ label, options, selected, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,7 +103,8 @@ const CargoModal = ({ isOpen, onClose, onRefresh }) => {
     return await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
       method: 'POST',
       headers: {
-        'Authorization': `Token ${token}`
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json'
       },
       body: formData,
     });
@@ -116,16 +114,11 @@ const CargoModal = ({ isOpen, onClose, onRefresh }) => {
     e.preventDefault();
     setLoading(true);
 
-    let token = localStorage.getItem('access_token');
+    let token = localStorage.getItem('token');
     console.log('Mavjud token:', token ? token.substring(0, 20) + '...' : 'yo\'q');
 
     if (!token) {
-      console.log('Token yo\'q, yangi token olinmoqda...');
-      token = await getAuthToken();
-    }
-
-    if (!token) {
-      alert("Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
+      alert("Token topilmadi. Iltimos, qayta tizimga kiring.");
       setLoading(false);
       return;
     }
@@ -143,42 +136,10 @@ const CargoModal = ({ isOpen, onClose, onRefresh }) => {
         onRefresh();
         onClose();
         form.reset();
-      } else if (response.status === 401) {
-        console.log('401 xatosi, yangi token olinmoqda...');
-        localStorage.removeItem('access_token');
-        const newToken = await getAuthToken();
-        if (newToken) {
-          const retryFormData = createFormData(form);
-          const retryResponse = await sendRequest(newToken, retryFormData);
-
-          if (retryResponse.ok) {
-            alert("Yuk muvaffaqiyatli qo'shildi!");
-            onRefresh();
-            onClose();
-            form.reset();
-          } else {
-            const errData = await retryResponse.json().catch(() => ({}));
-            alert("Xatolik: " + (errData.detail || errData.message || `${retryResponse.status} ${retryResponse.statusText}`));
-          }
-        } else {
-          alert("Token olishda xatolik. Iltimos, qayta urinib ko'ring.");
-        }
       } else {
-        let errorMessage = `Xatolik: ${response.status} ${response.statusText}`;
-        try {
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('application/json')) {
-            const errData = await response.json();
-            errorMessage = "Xatolik: " + (errData.detail || errData.message || `${response.status} ${response.statusText}`);
-          } else {
-            const text = await response.text();
-            console.error("Server javobi (JSON emas):", text);
-          }
-        } catch (parseErr) {
-          console.error("Xatolikni parse qilishda muammo:", parseErr);
-        }
-        console.error("Server xatosi:", errorMessage);
-        alert(errorMessage);
+        const errorText = await response.text();
+        console.error("Server xatosi:", response.status, errorText);
+        alert(`Xatolik: ${response.status} ${response.statusText}`);
       }
     } catch (err) {
       console.error("Tarmoq xatosi:", err);
@@ -275,7 +236,7 @@ const Yuk = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFreightData, setFilteredFreightData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const url_freight = 'https://tokennoty.pythonanywhere.com/api/freight/'
+  const [error, setError] = useState(null);
   const [freightData, setFreightData] = useState([]);
   const [stats, setStats] = useState({
     totalYuklar: 0,
@@ -283,6 +244,7 @@ const Yuk = () => {
     kutilmoqdaYuklar: 0,
     yetkazilganYuklar: 0
   });
+  const [user, setUser] = useState(null); // Add user state
 
   // Chart data for visualization
   const [chartData, setChartData] = useState([
@@ -297,206 +259,122 @@ const Yuk = () => {
 
   const COLORS = ['#4361ee', '#7209b7', '#f72585'];
 
-  // Component mount bo'lganda token olish
-  useEffect(() => {
-    const initializeToken = async () => {
-      const existingToken = localStorage.getItem('access_token');
-      if (!existingToken) {
-        await getAuthToken();
-      }
-    };
-    initializeToken();
-    loadData();
-  }, []);
+  // Yuklarni API dan olish funksiyasi (Dashboard.jsx dagi kabi)
+  const fetchFreights = async () => {
+    setLoading(true);
+    setError(null);
 
-  const loadData = async () => {
+    let token = localStorage.getItem('token');
+
+    if (!token) {
+      setError("Token topilmadi. Iltimos, qayta tizimga kiring.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      setLoading(true);
-      const token = localStorage.getItem('access_token');
+      // First get user data
+      const userResponse = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
+        headers: { 'Authorization': `Token ${token}` }
+      });
       
-      if (!token) {
-        console.log('Token yo\'q, yangi token olinmoqda...');
-        await getAuthToken();
-        return;
+      let userData = null;
+      if (userResponse.ok) {
+        userData = await userResponse.json();
+        console.log("API'dan kelgan foydalanuvchi ma'lumoti:", userData);
+
+        // Agar ma'lumot massiv bo'lib kelsa, birinchisini olamiz
+        if (Array.isArray(userData)) {
+          setUser(userData[0]);
+        } else {
+          setUser(userData);
+        }
       }
 
-      console.log('Tokenni ishlatmoqda:', token.substring(0, 20) + '...');
-      
-      // Yuklarni olish
-      const res = await fetch(url_freight, {
+      // Then get freight data
+      const response = await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
         headers: {
           'Authorization': `Token ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      if (!res.ok) {
-        if (res.status === 401) {
-          console.log('401 xatosi, yangi token olinmoqda...');
-          localStorage.removeItem('access_token');
-          const newToken = await getAuthToken();
-          if (newToken) {
-            // Qayta urinish
-            const retryRes = await fetch(url_freight, {
-              headers: {
-                'Authorization': `Token ${newToken}`,
-                'Content-Type': 'application/json'
-              }
-            });
-            if (retryRes.ok) {
-              const freight = await retryRes.json();
-              processFreightData(freight);
-            }
-          }
-        } else {
-          throw new Error(`HTTP error! status: ${res.status}`);
+      console.log('API javobi statusi:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API dan kelgan ma\'lumotlar:', data);
+        
+        // Filter by owner_username if user's username is 224443311
+        let filteredData = data;
+        if (userData && userData.username === "224443311") {
+          filteredData = data.filter(item => item.owner_username === "224443311");
+          console.log(`Filtered for user 224443311: ${filteredData.length} items found`);
         }
+        
+        const reversedData = filteredData.reverse(); // Dashboard dagi kabi teskari tartib
+        setFreightData(reversedData);
+        setFilteredFreightData(reversedData);
+        calculateStats(reversedData);
+        updateChartData(reversedData);
+      } else if (response.status === 404) {
+        console.log("API bo'sh yoki 404 xato");
+        setFreightData([]);
+        setFilteredFreightData([]);
       } else {
-        const freight = await res.json();
-        processFreightData(freight);
+        const errorText = await response.text();
+        console.error("API dan xato keldi:", response.status, errorText);
+        setError(`Server xatosi: ${response.status}`);
       }
-    } catch (error) {
-      console.error('Yuklarni yuklashda xatolik:', error);
-      // Agar API ishlamasa, demo data ko'rsatish
-      const demoData = [
-        {
-          id: 1,
-          title: "Meva yuki",
-          freight_type: "Umumiy yuk",
-          is_shipped: false,
-          created_at: "2026-01-17T10:30:00Z",
-          freight_rate_amount: "500000",
-          freight_rate_currency: "UZS",
-          route_starts_where_data: {
-            street: "Toshkent sh., Yunusobod t.",
-            region: "Toshkent viloyati"
-          },
-          route_ends_where_data: {
-            street: "Samarqand sh., Registon t.",
-            region: "Samarqand viloyati"
-          }
-        },
-        {
-          id: 2,
-          title: "Qurilish materiallari",
-          freight_type: "Mozor yuk",
-          is_shipped: true,
-          created_at: "2026-01-16T14:20:00Z",
-          freight_rate_amount: "1200000",
-          freight_rate_currency: "UZS",
-          route_starts_where_data: {
-            street: "Buxoro sh., Eski shahar t.",
-            region: "Buxoro viloyati"
-          },
-          route_ends_where_data: {
-            street: "Farg'ona sh., Markaziy t.",
-            region: "Farg'ona viloyati"
-          }
-        },
-        {
-          id: 3,
-          title: "Sovutilgan mahsulotlar",
-          freight_type: "Sovutilgan",
-          is_shipped: false,
-          created_at: "2026-01-15T09:15:00Z",
-          freight_rate_amount: "750000",
-          freight_rate_currency: "UZS",
-          route_starts_where_data: {
-            street: "Andijon sh., Bobur t.",
-            region: "Andijon viloyati"
-          },
-          route_ends_where_data: {
-            street: "Namangan sh., Chorsu t.",
-            region: "Namangan viloyati"
-          }
-        }
-      ];
-      
-      setFreightData(demoData);
-      setFilteredFreightData(demoData);
-      calculateStats(demoData);
-      updateChartData(demoData);
+    } catch (err) {
+      console.error("Internet yoki Server xatosi:", err);
+      setError("Server bilan aloqa yo'q. Internetingizni tekshiring.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const processFreightData = (freight) => {
-    // Agar ma'lumot massiv bo'lsa
-    const freightArray = Array.isArray(freight) ? freight : [freight];
-    
-    // Ma'lumotlarni tahlil qilish
-    const processedData = freightArray.map(item => {
-      // Agar route_starts_where_data string bo'lsa, parse qilishga urinamiz
-      let startData = item.route_starts_where_data;
-      let endData = item.route_ends_where_data;
-      
-      if (typeof startData === 'string') {
-        try {
-          startData = JSON.parse(startData);
-        } catch (e) {
-          console.warn('route_starts_where_data JSON parse qilishda xatolik:', e);
-          startData = { street: startData || "Noma'lum", region: "Noma'lum" };
-        }
-      }
-      
-      if (typeof endData === 'string') {
-        try {
-          endData = JSON.parse(endData);
-        } catch (e) {
-          console.warn('route_ends_where_data JSON parse qilishda xatolik:', e);
-          endData = { street: endData || "Noma'lum", region: "Noma'lum" };
-        }
-      }
-      
-      // Agar data object bo'lmasa, default qilamiz
-      if (!startData || typeof startData !== 'object') {
-        startData = { street: "Noma'lum", region: "Noma'lum" };
-      }
-      
-      if (!endData || typeof endData !== 'object') {
-        endData = { street: "Noma'lum", region: "Noma'lum" };
-      }
-      
-      return {
-        ...item,
-        route_starts_where_data: startData,
-        route_ends_where_data: endData
-      };
-    });
-    
-    setFreightData(processedData);
-    setFilteredFreightData(processedData);
-    
-    // Statistikani hisoblash
-    calculateStats(processedData);
-    
-    // Chart ma'lumotlarini yangilash
-    updateChartData(processedData);
-  }
+  useEffect(() => {
+    fetchFreights();
+  }, []);
 
   const calculateStats = (data) => {
     const total = data.length;
-    const faol = data.filter(item => !item.is_shipped).length;
-    const yetkazilgan = data.filter(item => item.is_shipped).length;
     
+    // Dashboard.jsx dagi kabi holatni aniqlash
+    const deliveredCount = data.filter(item =>
+      item.is_shipped === true ||
+      item.status === 'completed' ||
+      item.status === 'delivered'
+    ).length;
+
+    const inProgressCount = data.filter(item =>
+      item.is_shipped === false ||
+      item.is_shipped == null ||
+      item.status === 'active' ||
+      item.status === 'pending' ||
+      !item.status
+    ).length;
+
     // 3 kundan ko'p vaqt o'tgan faol yuklar
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     
-    const kutilmoqda = data.filter(item => {
-      if (item.is_shipped) return false;
+    const kutilmoqdaCount = data.filter(item => {
+      if (item.is_shipped === true) return false;
       if (!item.created_at) return false;
       
       const createdDate = new Date(item.created_at);
       return createdDate < threeDaysAgo;
     }).length;
-    
+
+    const faolCount = inProgressCount - kutilmoqdaCount;
+
     setStats({
       totalYuklar: total,
-      faolYuklar: faol,
-      kutilmoqdaYuklar: kutilmoqda,
-      yetkazilganYuklar: yetkazilgan
+      faolYuklar: faolCount,
+      kutilmoqdaYuklar: kutilmoqdaCount,
+      yetkazilganYuklar: deliveredCount
     });
   }
 
@@ -521,9 +399,7 @@ const Yuk = () => {
     try {
       const date = new Date(dateString);
       
-      // Agar date invalid bo'lsa
       if (isNaN(date.getTime())) {
-        // Formatni tekshirish: YYYY-MM-DD formatida bo'lsa
         const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
         if (match) {
           const [, year, month, day] = match;
@@ -578,23 +454,25 @@ const Yuk = () => {
     // Status filter
     if (selectedStatus !== "Barcha holatlar") {
       if (selectedStatus === "Faol") {
-        filtered = filtered.filter(item => !item.is_shipped);
+        filtered = filtered.filter(item => 
+          item.is_shipped === false ||
+          item.is_shipped == null ||
+          item.status === 'active' ||
+          !item.status
+        );
       } else if (selectedStatus === "Yetkazilgan") {
-        filtered = filtered.filter(item => item.is_shipped);
+        filtered = filtered.filter(item => 
+          item.is_shipped === true ||
+          item.status === 'completed' ||
+          item.status === 'delivered'
+        );
       } else if (selectedStatus === "Kutilmoqda") {
-        // 3 kundan ko'p vaqt o'tgan faol yuklar
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-        
-        filtered = filtered.filter(item => {
-          if (item.is_shipped) return false;
-          if (!item.created_at) return false;
-          
-          const createdDate = new Date(item.created_at);
-          return createdDate < threeDaysAgo;
-        });
+        filtered = filtered.filter(item => 
+          item.status === 'pending' ||
+          (item.is_shipped === false && item.created_at)
+        );
       } else if (selectedStatus === "Bekor qilingan") {
-        filtered = filtered.filter(item => item.freight_type === "cancelled" || item.status === "cancelled");
+        filtered = filtered.filter(item => item.status === 'cancelled');
       }
     }
 
@@ -603,25 +481,26 @@ const Yuk = () => {
       if (selectedType === "Umumiy yuk") {
         filtered = filtered.filter(item => 
           !item.freight_type || 
-          !item.freight_type.toLowerCase().includes("special") &&
-          !item.freight_type.toLowerCase().includes("refrigerated") &&
-          !item.freight_type.toLowerCase().includes("hazardous") &&
-          !item.freight_type.toLowerCase().includes("bulk")
+          item.freight_type.toLowerCase().includes('general') ||
+          item.freight_type.toLowerCase().includes('umumiy')
         );
       } else if (selectedType === "Sovutilgan") {
         filtered = filtered.filter(item => 
           item.freight_type && 
-          item.freight_type.toLowerCase().includes("refrigerated")
+          item.freight_type.toLowerCase().includes('refrigerated') ||
+          item.freight_type.toLowerCase().includes('sovutilgan')
         );
       } else if (selectedType === "Xavfli yuk") {
         filtered = filtered.filter(item => 
           item.freight_type && 
-          item.freight_type.toLowerCase().includes("hazardous")
+          item.freight_type.toLowerCase().includes('hazardous') ||
+          item.freight_type.toLowerCase().includes('xavfli')
         );
       } else if (selectedType === "Mozor yuk") {
         filtered = filtered.filter(item => 
           item.freight_type && 
-          item.freight_type.toLowerCase().includes("bulk")
+          item.freight_type.toLowerCase().includes('bulk') ||
+          item.freight_type.toLowerCase().includes('mozor')
         );
       }
     }
@@ -654,25 +533,28 @@ const Yuk = () => {
     // Tab filter
     if (activeTab !== "Barcha Yuklar") {
       if (activeTab === "Faol") {
-        filtered = filtered.filter(item => !item.is_shipped);
+        filtered = filtered.filter(item => 
+          item.is_shipped === false ||
+          item.is_shipped == null ||
+          item.status === 'active' ||
+          !item.status
+        );
       } else if (activeTab === "Yetkazilgan") {
-        filtered = filtered.filter(item => item.is_shipped);
+        filtered = filtered.filter(item => 
+          item.is_shipped === true ||
+          item.status === 'completed' ||
+          item.status === 'delivered'
+        );
       } else if (activeTab === "Kutilmoqda") {
-        // 3 kundan ko'p vaqt o'tgan faol yuklar
-        const threeDaysAgo = new Date();
-        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-        
-        filtered = filtered.filter(item => {
-          if (item.is_shipped) return false;
-          if (!item.created_at) return false;
-          
-          const createdDate = new Date(item.created_at);
-          return createdDate < threeDaysAgo;
-        });
+        filtered = filtered.filter(item => 
+          item.status === 'pending' ||
+          (item.is_shipped === false && item.created_at)
+        );
       } else if (activeTab === "Bekor Qilingan") {
-        filtered = filtered.filter(item => item.freight_type === "cancelled" || item.status === "cancelled");
+        filtered = filtered.filter(item => item.status === 'cancelled');
       } else if (activeTab === "Mening Yuklarim") {
         // Hozircha barchasini ko'rsatamiz
+        // Kelajakda faqat foydalanuvchi yuklarini filtrlash mumkin
         filtered = filtered;
       }
     }
@@ -713,23 +595,38 @@ const Yuk = () => {
     { name: 'Kutilmoqda', value: stats.kutilmoqdaYuklar },
   ];
 
-  // Get location display text
+  // Get location display text (Dashboard.jsx dagi kabi)
   const getLocationDisplay = (locationData) => {
     if (!locationData) return "Noma'lum";
     
-    const street = locationData.street || locationData.address || locationData.name || "";
-    const region = locationData.region || locationData.city || locationData.state || "";
-    
-    if (street && region) {
-      return `${street}, ${region}`;
-    } else if (street) {
-      return street;
-    } else if (region) {
-      return region;
+    // Agar locationData object bo'lsa
+    if (typeof locationData === 'object') {
+      const street = locationData.street || locationData.address || "";
+      const region = locationData.region || locationData.city || locationData.state || "";
+      
+      if (street && region) {
+        return `${street}, ${region}`;
+      } else if (street) {
+        return street;
+      } else if (region) {
+        return region;
+      }
     }
     
-    return "Noma'lum";
+    // Agar string bo'lsa
+    return locationData || "Noma'lum";
   }
+
+  // Holat rangini olish
+  const getStatusColor = (item) => {
+    if (item.is_shipped === true || item.status === 'completed' || item.status === 'delivered') {
+      return { text: 'YETKAZILDI', bg: 'bg-violet-300/30', textColor: 'text-violet-700' };
+    } else if (item.status === 'pending' || item.is_shipped === false) {
+      return { text: 'KUTILMOQDA', bg: 'bg-amber-300/30', textColor: 'text-amber-700' };
+    } else {
+      return { text: 'FAOL', bg: 'bg-blue-300/30', textColor: 'text-sky-500' };
+    }
+  };
 
   return (
     <div className='min-h-screen bg-zinc-100'>
@@ -738,6 +635,19 @@ const Yuk = () => {
         <h1 className='py-8 text-5xl font-semibold max-sm:mx-3'>Yuklar</h1>
         <p className='text-xl text-gray-600 pb-3 max-sm:mx-3'>Barcha yuklaringizni boshqaring, kuzating va tahrirlang</p>
         
+        {/* Xatolik xabari */}
+        {error && (
+          <div className="mx-3 mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+            <p className="text-red-600">{error}</p>
+            <button
+              onClick={fetchFreights}
+              className="mt-2 text-sm text-red-700 hover:text-red-900 font-medium"
+            >
+              Qayta urinish
+            </button>
+          </div>
+        )}
+
         {/* Statistikalar */}
         <div className="grid lg:grid-cols-2 gap-x-5">
           <div className="chart">
@@ -898,15 +808,7 @@ const Yuk = () => {
         </div>
 
         {/* Natijalar soni */}
-        <div className="px-6 py-3 bg-white rounded-xl my-4">
-          <p className="text-gray-600">
-            Topilgan yuklar: <span className="font-bold text-blue-700">{filteredFreightData.length} ta</span>
-            {searchQuery && ` ("${searchQuery}" so'zi bo'yicha)`}
-            {selectedStatus !== "Barcha holatlar" && `, Holat: ${selectedStatus}`}
-            {selectedType !== "Barcha turlar" && `, Tur: ${selectedType}`}
-            {selectedTime !== "Barcha vaqtlar" && `, Vaqt: ${selectedTime}`}
-          </p>
-        </div>
+
 
         {/* Tablar */}
         <div className="flex items-center flex-wrap gap-y-4 px-1 my-10">
@@ -945,55 +847,66 @@ const Yuk = () => {
                 </tr>
               </thead>
               <tbody className='bg-white'>
-                {filteredFreightData.map((item, index) => (
-                  <tr key={index} className='hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100'>
-                    <td className='py-4 px-4'>
-                      <p className='font-semibold'>YUK-{item.id}</p>
-                      <p className='text-sm text-gray-600'>{item.title || item.freight_type || "Yuk"}</p>
-                    </td>
-                    <td className='py-4 px-4'>
-                      <div className='flex items-center gap-x-2 mb-2'>
-                        <span className='px-2 bg-blue-500/20 rounded-full text-blue-700 pb-1'>
-                          <FaLocationDot className='inline text-xs' />
-                        </span>
-                        <div>
-                          <p className='font-semibold'>Qayerdan</p>
-                          <p className='text-sm text-gray-600'>
-                            {getLocationDisplay(item.route_starts_where_data)}
-                          </p>
+                {filteredFreightData.map((item, index) => {
+                  const status = getStatusColor(item);
+                  return (
+                    <tr key={index} className='hover:bg-gray-50 transition-colors duration-150 border-b border-gray-100'>
+                      <td className='py-4 px-4'>
+                        <p className='font-semibold'>YUK-{item.id || index + 1}</p>
+                        <p className='text-sm text-gray-600'>{item.title || item.freight_type || "Yuk"}</p>
+                      </td>
+                      <td className='py-4 px-4'>
+                        <div className='flex items-center gap-x-2 mb-2'>
+                          <span className='px-2 bg-blue-500/20 rounded-full text-blue-700 pb-1'>
+                            <FaLocationDot className='inline text-xs' />
+                          </span>
+                          <div>
+                            <p className='font-semibold'>Qayerdan</p>
+                            <p className='text-sm text-gray-600'>
+                              {getLocationDisplay(item.route_starts_where_data) || 
+                               item.route_starts_where_city || 
+                               item.origin_address || 
+                               item.from_city || 
+                               "Noma'lum"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-x-2">
-                        <span className='pb-1 px-2 text-violet-900 bg-violet-600/20 rounded-full'>
-                          <FaFlagCheckered className='inline text-xs' />
-                        </span>
-                        <div>
-                          <p className='font-semibold'>Qayerga</p>
-                          <p className='text-sm text-gray-600'>
-                            {getLocationDisplay(item.route_ends_where_data)}
-                          </p>
+                        <div className="flex items-center gap-x-2">
+                          <span className='pb-1 px-2 text-violet-900 bg-violet-600/20 rounded-full'>
+                            <FaFlagCheckered className='inline text-xs' />
+                          </span>
+                          <div>
+                            <p className='font-semibold'>Qayerga</p>
+                            <p className='text-sm text-gray-600'>
+                              {getLocationDisplay(item.route_ends_where_data) || 
+                               item.route_ends_where_city || 
+                               item.destination_address || 
+                               item.to_city || 
+                               "Noma'lum"}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className='py-4 px-4'>
-                      <span className={`rounded-full flex max-w-24 items-center ${item.is_shipped ? 'text-violet-700 bg-violet-300/30' : 'text-sky-500 bg-blue-300/30'} px-3 py-1`}>
-                        <GoDotFill className='inline mr-1' /> 
-                        {item.is_shipped ? 'YETKAZILDI' : 'FAOL'}
-                      </span>
-                    </td>
-                    <td className='py-4 px-4'>
-                      <p className='font-semibold'>{formatDate(item.created_at)}</p>
-                      <p className='text-sm text-gray-600'>{formatTime(item.created_at)}</p>
-                    </td>
-                    <td className='py-4 px-4'>
-                      <p className="font-semibold text-lg">
-                        {item.freight_rate_amount ? 
-                          parseInt(item.freight_rate_amount).toLocaleString('uz-UZ') : 
-                          "0"} {item.freight_rate_currency || "UZS"}
-                      </p>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className='py-4 px-4'>
+                        <span className={`rounded-full flex max-w-24 items-center ${status.bg} ${status.textColor} px-3 py-1`}>
+                          <GoDotFill className='inline mr-1' /> 
+                          {status.text}
+                        </span>
+                      </td>
+                      <td className='py-4 px-4'>
+                        <p className='font-semibold'>{formatDate(item.created_at)}</p>
+                        <p className='text-sm text-gray-600'>{formatTime(item.created_at)}</p>
+                      </td>
+                      <td className='py-4 px-4'>
+                        <p className="font-semibold text-lg">
+                          {item.freight_rate_amount || item.price || item.rate
+                            ? parseInt(item.freight_rate_amount || item.price || item.rate).toLocaleString('uz-UZ')
+                            : "0"} so'm
+                        </p>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}
@@ -1004,7 +917,7 @@ const Yuk = () => {
       <CargoModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onRefresh={loadData}
+        onRefresh={fetchFreights}
       />
     </div>
   )

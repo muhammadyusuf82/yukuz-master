@@ -8,42 +8,7 @@ import {
 } from "react-icons/fa";
 
 // Token olish funksiyasi
-const getAuthToken = async () => {
-    try {
-        const response = await fetch('https://tokennoty.pythonanywhere.com/api/token/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                password: "123",
-                phone_number: "+998993967336"
-            }),
-        });
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Token API javobi (to\'liq):', JSON.stringify(data, null, 2));
-            const token = data.token || data.token || data.access || data.accessToken || (data.data && data.data.token) || (data.data && data.data.token);
-            if (token) {
-                localStorage.removeItem('token');
-                localStorage.setItem('token', token);
-                console.log('Yangi token saqlandi:', token.substring(0, 20) + '...');
-                console.log('Token uzunligi:', token.length);
-                return token;
-            } else {
-                console.error('Token topilmadi. API javobi:', JSON.stringify(data, null, 2));
-                console.error('API javobidagi barcha kalitlar:', Object.keys(data));
-            }
-        } else {
-            const errorText = await response.text();
-            console.error('Token olishda xatolik:', response.status, response.statusText, errorText);
-        }
-    } catch (error) {
-        console.error('Token olishda tarmoq xatosi:', error);
-    }
-    return null;
-};
 
 function Dashboard({ onFreightDetail }) {
     // --- STATES ---
@@ -61,9 +26,6 @@ function Dashboard({ onFreightDetail }) {
 
         let token = localStorage.getItem('token');
 
-        if (!token) {
-            token = await getAuthToken();
-        }
 
         if (!token) {
             setError("Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
@@ -71,43 +33,15 @@ function Dashboard({ onFreightDetail }) {
             return;
         }
 
+        // In the try block of fetchNotes function:
         try {
-            const response = await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
-                headers: {
-                    'Authorization': `Token ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            console.log('API javobi statusi:', response.status);
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('API dan kelgan ma\'lumotlar:', data);
-                setApiLoads(data.reverse());
-            } else if (response.status === 404) {
-                console.log("API bo'sh yoki 404 xato");
-                setApiLoads([]);
-            } else {
-                const errorText = await response.text();
-                console.error("API dan xato keldi:", response.status, errorText);
-                setError(`Server xatosi: ${response.status}`);
-
-                const newToken = await getAuthToken();
-                if (newToken) {
-                    setTimeout(() => {
-                        fetchNotes();
-                    }, 1000);
-                }
-            }
-
-            // Foydalanuvchi ma'lumotlarini (rolini) olish
+            // First get user data
             const userResponse = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
                 headers: { 'Authorization': `Token ${token}` }
             });
             if (userResponse.ok) {
                 const userData = await userResponse.json();
-                console.log("API'dan kelgan foydalanuvchi ma'lumoti:", userData); // Tekshirish uchun
+                console.log("API'dan kelgan foydalanuvchi ma'lumoti:", userData);
 
                 // Agar ma'lumot massiv bo'lib kelsa, birinchisini olamiz
                 if (Array.isArray(userData)) {
@@ -115,9 +49,40 @@ function Dashboard({ onFreightDetail }) {
                 } else {
                     setUser(userData);
                 }
+
+                // Then get freight data
+                const response = await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
+                    headers: {
+                        'Authorization': `Token ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('API javobi statusi:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('API dan kelgan ma\'lumotlar:', data);
+
+                    // Filter by owner_username if user's username is 224443311
+                    let filteredData = data;
+                    if (userData.role === "broker") {
+                        filteredData = data.filter(item => item.owner_username === "224443311");
+                        console.log(`Filtered for user 224443311: ${filteredData.length} items found`);
+                    }
+
+                    setApiLoads(filteredData.reverse());
+                } else if (response.status === 404) {
+                    console.log("API bo'sh yoki 404 xato");
+                    setApiLoads([]);
+                } else {
+                    const errorText = await response.text();
+                    console.error("API dan xato keldi:", response.status, errorText);
+                    setError(`Server xatosi: ${response.status}`);
+                }
             }
         } catch (err) {
-            console.error("Internet yoki Server xatosi:", err);
+            console.error("Internet yoko Server xatosi:", err);
             setError("Server bilan aloqa yo'q. Internetingizni tekshiring.");
         } finally {
             setLoading(false);
@@ -127,9 +92,6 @@ function Dashboard({ onFreightDetail }) {
     useEffect(() => {
         const initializeToken = async () => {
             const existingToken = localStorage.getItem('token');
-            if (!existingToken) {
-                await getAuthToken();
-            }
         };
         initializeToken().then(() => {
             fetchNotes();
