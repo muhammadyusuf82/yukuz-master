@@ -7,17 +7,167 @@ import {
     FaSyncAlt, FaExclamationTriangle
 } from "react-icons/fa";
 
-// Token olish funksiyasi
+// Translation object for Dashboard
+const dashboardTranslations = {
+  uz: {
+    welcome: "Xush kelibsiz",
+    todayActivity: "Bugun nima qilmoqchisiz? Yuklar soni",
+    refresh: "Yangilash",
+    viewApp: "Ilovani ko'rish",
+    totalLoads: "Umumiy yuklar",
+    delivered: "Yetkazilgan",
+    inProgress: "Jarayonda",
+    quickActions: "Tezkor Amallar",
+    addLoad: "Yuk qo'shish",
+    myLoads: "Yuklarim",
+    tracking: "Kuzatish",
+    payment: "To'lov",
+    loads: "Yuklar",
+    all: "Barchasi",
+    active: "Faol",
+    waiting: "Kutilmoqda",
+    completed: "Yakunlangan",
+    seeDetails: "Batafsil ko'rish",
+    realTimeMap: "Real vaqtda xarita",
+    filter: "Filtr",
+    recentActivity: "So'nggi Faoliyat",
+    noActivity: "Hozircha faollik yo'q",
+    noLoads: "Hozircha yuklar yo'q",
+    noLoadsForFilter: " yuklar topilmadi",
+    loadDelivered: "Yuk yetkazildi",
+    loadAdded: "Yangi yuk qo'shildi",
+    tokenError: "Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.",
+    serverError: "Server bilan aloqa yo'q. Internetingizni tekshiring.",
+    retry: "Qayta urinish",
+    loading: "Yuklanmoqda...",
+    kg: "kg",
+    m3: "m³",
+    priceSuffix: "so'm",
+    negotiated: "Kelishilgan",
+    justNow: "Hozirgina",
+    secondsAgo: "soniya oldin",
+    minutesAgo: "daqiqa oldin",
+    hoursAgo: "soat oldin",
+    daysAgo: "kun oldin",
+    weeksAgo: "hafta oldin",
+    monthsAgo: "oy oldin",
+    yearsAgo: "yil oldin",
+    update: "Yangilash",
+    view: "Ko'rish"
+  },
+  ru: {
+    welcome: "Добро пожаловать",
+    todayActivity: "Что вы хотите сделать сегодня? Количество грузов",
+    refresh: "Обновить",
+    viewApp: "Посмотреть приложение",
+    totalLoads: "Все грузы",
+    delivered: "Доставлено",
+    inProgress: "В процессе",
+    quickActions: "Быстрые действия",
+    addLoad: "Добавить груз",
+    myLoads: "Мои грузы",
+    tracking: "Отслеживание",
+    payment: "Оплата",
+    loads: "Грузы",
+    all: "Все",
+    active: "Активные",
+    waiting: "Ожидание",
+    completed: "Завершенные",
+    seeDetails: "Подробнее",
+    realTimeMap: "Карта в реальном времени",
+    filter: "Фильтр",
+    recentActivity: "Недавняя активность",
+    noActivity: "Пока нет активности",
+    noLoads: "Пока нет грузов",
+    noLoadsForFilter: " грузы не найдены",
+    loadDelivered: "Груз доставлен",
+    loadAdded: "Добавлен новый груз",
+    tokenError: "Ошибка при получении токена. Пожалуйста, попробуйте снова.",
+    serverError: "Нет связи с сервером. Проверьте интернет соединение.",
+    retry: "Попробовать снова",
+    loading: "Загрузка...",
+    kg: "кг",
+    m3: "м³",
+    priceSuffix: "сум",
+    negotiated: "Договорная",
+    justNow: "Только что",
+    secondsAgo: "секунд назад",
+    minutesAgo: "минут назад",
+    hoursAgo: "часов назад",
+    daysAgo: "дней назад",
+    weeksAgo: "недель назад",
+    monthsAgo: "месяцев назад",
+    yearsAgo: "лет назад",
+    update: "Обновить",
+    view: "Просмотр"
+  },
+  en: {
+    welcome: "Welcome",
+    todayActivity: "What do you want to do today? Loads count",
+    refresh: "Refresh",
+    viewApp: "View app",
+    totalLoads: "Total loads",
+    delivered: "Delivered",
+    inProgress: "In progress",
+    quickActions: "Quick Actions",
+    addLoad: "Add load",
+    myLoads: "My loads",
+    tracking: "Tracking",
+    payment: "Payment",
+    loads: "Loads",
+    all: "All",
+    active: "Active",
+    waiting: "Waiting",
+    completed: "Completed",
+    seeDetails: "See details",
+    realTimeMap: "Real-time map",
+    filter: "Filter",
+    recentActivity: "Recent Activity",
+    noActivity: "No activity yet",
+    noLoads: "No loads yet",
+    noLoadsForFilter: " loads not found",
+    loadDelivered: "Load delivered",
+    loadAdded: "New load added",
+    tokenError: "Error getting token. Please try again.",
+    serverError: "No connection with server. Check your internet.",
+    retry: "Retry",
+    loading: "Loading...",
+    kg: "kg",
+    m3: "m³",
+    priceSuffix: "sum",
+    negotiated: "Negotiated",
+    justNow: "Just now",
+    secondsAgo: "seconds ago",
+    minutesAgo: "minutes ago",
+    hoursAgo: "hours ago",
+    daysAgo: "days ago",
+    weeksAgo: "weeks ago",
+    monthsAgo: "months ago",
+    yearsAgo: "years ago",
+    update: "Update",
+    view: "View"
+  }
+};
 
-
-function Dashboard({ onFreightDetail }) {
+function Dashboard({ onFreightDetail, currentLang }) {
     // --- STATES ---
     const [apiLoads, setApiLoads] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState("Barchasi");
+    const [filter, setFilter] = useState("all");
     const [currentPage, setCurrentPage] = useState(1);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null)
+
+    // Get translations based on current language
+    const t = dashboardTranslations[currentLang || 'uz'];
+
+    // Filter options translation mapping
+    const filterOptions = {
+        'all': t.all,
+        'active': t.active,
+        'waiting': t.waiting,
+        'completed': t.completed
+    };
 
     // Yuklarni olish funksiyasi
     const fetchNotes = async () => {
@@ -26,16 +176,13 @@ function Dashboard({ onFreightDetail }) {
 
         let token = localStorage.getItem('token');
 
-
         if (!token) {
-            setError("Token olishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring.");
+            setError(t.tokenError);
             setLoading(false);
             return;
         }
 
-        // In the try block of fetchNotes function:
         try {
-            // First get user data
             const userResponse = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
                 headers: { 'Authorization': `Token ${token}` }
             });
@@ -43,15 +190,13 @@ function Dashboard({ onFreightDetail }) {
                 const userData = await userResponse.json();
                 console.log("API'dan kelgan foydalanuvchi ma'lumoti:", userData);
 
-                // Agar ma'lumot massiv bo'lib kelsa, birinchisini olamiz
                 if (Array.isArray(userData)) {
                     setUser(userData[0]);
                 } else {
                     setUser(userData);
                 }
-
-                // Then get freight data
-                const response = await fetch('https://tokennoty.pythonanywhere.com/api/freight/', {
+                const url = 'https://tokennoty.pythonanywhere.com/api/freight/'
+                const response = await fetch(userData.role==='broker' ? url+'?owner__role=broker' : url, {
                     headers: {
                         'Authorization': `Token ${token}`,
                         'Content-Type': 'application/json'
@@ -64,11 +209,10 @@ function Dashboard({ onFreightDetail }) {
                     const data = await response.json();
                     console.log('API dan kelgan ma\'lumotlar:', data);
 
-                    // Filter by owner_username if user's username is 224443311
                     let filteredData = data;
                     if (userData.role === "broker") {
-                        filteredData = data.filter(item => item.owner_username === "224443311");
-                        console.log(`Filtered for user 224443311: ${filteredData.length} items found`);
+                        filteredData=data
+
                     }
 
                     setApiLoads(filteredData.reverse());
@@ -83,7 +227,7 @@ function Dashboard({ onFreightDetail }) {
             }
         } catch (err) {
             console.error("Internet yoko Server xatosi:", err);
-            setError("Server bilan aloqa yo'q. Internetingizni tekshiring.");
+            setError(t.serverError);
         } finally {
             setLoading(false);
         }
@@ -99,14 +243,14 @@ function Dashboard({ onFreightDetail }) {
     }, []);
 
     const filterLoads = (loads, filterType) => {
-        if (filterType === "Barchasi") return loads;
+        if (filterType === "all") return loads;
 
         return loads.filter(item => {
-            if (filterType === "Faol") {
+            if (filterType === "active") {
                 return item.situation === "FAOL" || item.situation === "Featured";
-            } else if (filterType === "Kutilmoqda") {
+            } else if (filterType === "waiting") {
                 return item.situation === "KUTILMOQDA";
-            } else if (filterType === "Yakunlangan") {
+            } else if (filterType === "completed") {
                 return item.situation === "YAKUNLANDI";
             }
             return true;
@@ -165,7 +309,7 @@ function Dashboard({ onFreightDetail }) {
             benefit: statistics.percentTotal >= 0,
             percent: Math.abs(statistics.percentTotal),
             total: statistics.totalCount,
-            title: "Umumiy yuklar"
+            title: t.totalLoads
         },
         {
             id: 2,
@@ -175,7 +319,7 @@ function Dashboard({ onFreightDetail }) {
             benefit: statistics.percentDelivered >= 0,
             percent: Math.abs(statistics.percentDelivered),
             total: statistics.deliveredCount,
-            title: "Yetkazilgan"
+            title: t.delivered
         },
         {
             id: 3,
@@ -185,16 +329,16 @@ function Dashboard({ onFreightDetail }) {
             benefit: statistics.percentInProgress >= 0,
             percent: Math.abs(statistics.percentInProgress),
             total: statistics.inProgressCount,
-            title: "Jarayonda"
+            title: t.inProgress
         },
 
-    ], [statistics]);
+    ], [statistics, t]);
 
     const actins = [
-        { id: 1, icon: FaPlus, icon_color: '#4361ee', title: 'Yuk qo\'shish', action: () => onFreightDetail("Yuk qo'shish") },
-        { id: 2, icon: FaBox, icon_color: '#4cc9f0', title: 'Yuklarim', action: () => onFreightDetail("Mening yuklarim") },
-        { id: 3, icon: FaMapMarkerAlt, icon_color: '#f72585', title: 'Kuzatish', action: () => console.log("Kuzatish") },
-        { id: 4, icon: FaCreditCard, icon_color: '#7209b7', title: 'To\'lov', action: () => onFreightDetail("To'lovlar") },
+        { id: 1, icon: FaPlus, icon_color: '#4361ee', title: t.addLoad, action: () => onFreightDetail("Yuk qo'shish") },
+        { id: 2, icon: FaBox, icon_color: '#4cc9f0', title: t.myLoads, action: () => onFreightDetail("Mening yuklarim") },
+        { id: 3, icon: FaMapMarkerAlt, icon_color: '#f72585', title: t.tracking, action: () => console.log("Kuzatish") },
+        { id: 4, icon: FaCreditCard, icon_color: '#7209b7', title: t.payment, action: () => onFreightDetail("To'lovlar") },
     ];
 
     const mappedLoads = useMemo(() => {
@@ -263,14 +407,14 @@ function Dashboard({ onFreightDetail }) {
                 date: item.created_at ? item.created_at.slice(0, 10) :
                     (item.created_date ? item.created_date.slice(0, 10) : "Yangi"),
                 price: item.freight_rate_amount || item.price || item.rate
-                    ? parseInt(item.freight_rate_amount || item.price || item.rate).toLocaleString() + " so'm"
-                    : "Kelishilgan",
+                    ? parseInt(item.freight_rate_amount || item.price || item.rate).toLocaleString() + ` ${t.priceSuffix}`
+                    : t.negotiated,
                 is_shipped: item.is_shipped,
                 status: item.status,
                 originalData: item
             }
         });
-    }, [apiLoads]);
+    }, [apiLoads, t]);
 
     const filteredLoads = useMemo(() => {
         return filterLoads(mappedLoads, filter);
@@ -290,50 +434,50 @@ function Dashboard({ onFreightDetail }) {
     };
 
     const formatTimeAgo = (dateString) => {
-        if (!dateString) return "Hozirgina";
+        if (!dateString) return t.justNow;
 
         const date = new Date(dateString);
         const now = new Date();
         const diffInSeconds = Math.floor((now - date) / 1000);
 
         if (diffInSeconds < 60) {
-            return `${diffInSeconds} soniya oldin`;
+            return `${diffInSeconds} ${t.secondsAgo}`;
         }
 
         const diffInMinutes = Math.floor(diffInSeconds / 60);
         if (diffInMinutes < 60) {
-            return `${diffInMinutes} daqiqa oldin`;
+            return `${diffInMinutes} ${t.minutesAgo}`;
         }
 
         const diffInHours = Math.floor(diffInMinutes / 60);
         if (diffInHours < 24) {
-            return `${diffInHours} soat oldin`;
+            return `${diffInHours} ${t.hoursAgo}`;
         }
 
         const diffInDays = Math.floor(diffInHours / 24);
         if (diffInDays < 7) {
-            return `${diffInDays} kun oldin`;
+            return `${diffInDays} ${t.daysAgo}`;
         }
 
         const diffInWeeks = Math.floor(diffInDays / 7);
         if (diffInWeeks < 4) {
-            return `${diffInWeeks} hafta oldin`;
+            return `${diffInWeeks} ${t.weeksAgo}`;
         }
 
         const diffInMonths = Math.floor(diffInDays / 30);
         if (diffInMonths < 12) {
-            return `${diffInMonths} oy oldin`;
+            return `${diffInMonths} ${t.monthsAgo}`;
         }
 
         const diffInYears = Math.floor(diffInDays / 365);
-        return `${diffInYears} yil oldin`;
+        return `${diffInYears} ${t.yearsAgo}`;
     };
 
     const recentActivity = apiLoads.slice(0, 3).map((item, i) => ({
         id: item.id || i,
         icon: i === 0 ? FaCheck : i === 1 ? FaGavel : FaExclamationTriangle,
         icon_color: i === 0 ? "text-[#4cc9f0]" : i === 1 ? "text-[#4361ee]" : "text-[#f72585]",
-        title: item.is_shipped ? "Yuk yetkazildi" : "Yangi yuk qo'shildi",
+        title: item.is_shipped ? t.loadDelivered : t.loadAdded,
         desc: item.freight_type || item.title || "Yuk",
         time: formatTimeAgo(item.created_at || item.updated_at || item.created_date)
     }));
@@ -351,20 +495,20 @@ function Dashboard({ onFreightDetail }) {
             <div className="w-full flex gap-3 sm:gap-4 md:gap-5 flex-col">
                 <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 items-center justify-between hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
                     <div className='w-full sm:w-3/6 text-center sm:text-left'>
-                        <h2 className='text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2'>Xush kelibsiz, {user?.first_name || "Foydalanuvchi"}</h2>
-                        <p className='text-sm sm:text-base md:text-lg text-gray-600'>Bugun nima qilmoqchisiz? Yuklar soni: {apiLoads.length}</p>
+                        <h2 className='text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2'>{t.welcome}, {user?.first_name || "Foydalanuvchi"}</h2>
+                        <p className='text-sm sm:text-base md:text-lg text-gray-600'>{t.todayActivity}: {apiLoads.length}</p>
                     </div>
                     <div className='flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto'>
                         <button
                             onClick={handleRefresh}
                             className='relative text-sm sm:text-base text-white font-semibold bg-[#415fe9] border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-2 px-3 sm:py-2 sm:px-6 hover:shadow-xl transform hover:-translate-y-1 duration-300 cursor-pointer overflow-hidden group'>
                             <FaSyncAlt className='text-sm sm:text-base' />
-                            Yangilash
+                            {t.refresh}
                             <div className="absolute w-0 h-0 rounded-full bg-white/40 group-hover:w-40 group-hover:h-40 duration-500"></div>
                         </button>
                         <button className='relative text-sm sm:text-base text-[#415fe9] font-semibold bg-white border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-2 px-3 sm:py-2 sm:px-6 hover:bg-[#415fe9] hover:text-white duration-300 cursor-pointer overflow-hidden group'>
                             <FaMobileAlt className='text-sm sm:text-base' />
-                            Ilovani ko'rish
+                            {t.viewApp}
                             <div className="absolute w-0 h-0 rounded-full bg-white/40 group-hover:w-40 group-hover:h-40 duration-500"></div>
                         </button>
                     </div>
@@ -377,7 +521,7 @@ function Dashboard({ onFreightDetail }) {
                             onClick={handleRefresh}
                             className="mt-2 text-sm text-red-700 hover:text-red-900 font-medium"
                         >
-                            Qayta urinish
+                            {t.retry}
                         </button>
                     </div>
                 )}
@@ -409,13 +553,13 @@ function Dashboard({ onFreightDetail }) {
 
                 <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
                     <h1 className="text-lg sm:text-xl md:text-2xl font-bold border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8">
-                        Tezkor Amallar
+                        {t.quickActions}
                     </h1>
                     <div className="grid gap-2 sm:gap-3 md:gap-4 lg:gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 py-2 sm:py-3 md:py-4 lg:py-5 px-2 sm:px-3 md:px-4 lg:px-6">
                         {actins
                             .filter(item => {
                                 const isDriver = user?.role?.toLowerCase() === 'driver';
-                                const isAddFreightAction = item.title === "Yuk qo'shish";
+                                const isAddFreightAction = item.title === t.addLoad;
                                 return !(isDriver && isAddFreightAction);
                             })
                             .map((item) => (
@@ -430,20 +574,20 @@ function Dashboard({ onFreightDetail }) {
                 <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300 my-5 sm:my-6 md:my-8 lg:my-10 py-5 sm:py-6 md:py-8 lg:py-10 px-3 sm:px-4 md:px-5 lg:px-8">
                     <div className="flex flex-col sm:flex-row items-center justify-between mb-5 sm:mb-6 md:mb-8 lg:mb-10">
                         <h1 className='text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center sm:text-left mb-4 sm:mb-0'>
-                            Yuklar ({filteredLoads.length} ta)
+                            {t.loads} ({filteredLoads.length} ta)
                         </h1>
                         <div className="flex flex-wrap gap-2 sm:gap-3 md:gap-4 justify-center">
-                            {["Barchasi", "Faol", "Kutilmoqda", "Yakunlangan"].map((tab) => (
+                            {Object.keys(filterOptions).map((key) => (
                                 <button
-                                    key={tab}
+                                    key={key}
                                     onClick={() => {
-                                        setFilter(tab);
+                                        setFilter(key);
                                         setCurrentPage(1);
                                     }}
-                                    className={`px-3 sm:px-4 md:px-5 lg:px-6 py-1 sm:py-1.5 md:py-2 rounded-full font-medium sm:font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 cursor-pointer ${filter === tab ? 'bg-[#4361ee] text-white shadow-lg scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'
+                                    className={`px-3 sm:px-4 md:px-5 lg:px-6 py-1 sm:py-1.5 md:py-2 rounded-full font-medium sm:font-semibold text-xs sm:text-sm md:text-base transition-all duration-300 cursor-pointer ${filter === key ? 'bg-[#4361ee] text-white shadow-lg scale-105' : 'bg-white text-gray-500 hover:bg-gray-100'
                                         }`}
                                 >
-                                    {tab}
+                                    {filterOptions[key]}
                                 </button>
                             ))}
                         </div>
@@ -452,15 +596,15 @@ function Dashboard({ onFreightDetail }) {
                     {loading ? (
                         <div className="text-center py-10">
                             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#4361ee]"></div>
-                            <p className="mt-2 text-gray-600">Yuklanmoqda...</p>
+                            <p className="mt-2 text-gray-600">{t.loading}</p>
                         </div>
                     ) : filteredLoads.length === 0 ? (
                         <div className="text-center py-10">
                             <FaBox className="inline-block text-4xl text-gray-300 mb-4" />
                             <p className="text-gray-500 text-lg">
-                                {filter === "Barchasi"
-                                    ? "Hozircha yuklar yo'q"
-                                    : `${filter} yuklar topilmadi`}
+                                {filter === "all"
+                                    ? t.noLoads
+                                    : `${filterOptions[filter]}${t.noLoadsForFilter}`}
                             </p>
                         </div>
                     ) : (
@@ -499,11 +643,11 @@ function Dashboard({ onFreightDetail }) {
                                     <div className="grid grid-cols-2 gap-y-2 sm:gap-y-3 gap-x-1 sm:gap-x-2 px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 bg-slate-50/50">
                                         <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
                                             <FaWeightHanging className='text-[#4361ee] text-xs sm:text-sm' />
-                                            <span>{item.ton} kg</span>
+                                            <span>{item.ton} {t.kg}</span>
                                         </div>
                                         <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
                                             <FaRulerCombined className='text-[#4361ee] text-xs sm:text-sm' />
-                                            <span>{item.m} m³</span>
+                                            <span>{item.m} {t.m3}</span>
                                         </div>
                                         <div className='flex gap-1 sm:gap-2 items-center text-xs sm:text-sm text-slate-600 font-medium'>
                                             {getProductIcon(item.product)}
@@ -521,7 +665,7 @@ function Dashboard({ onFreightDetail }) {
                                             onClick={() => handleFreightDetailClick(item)}
                                             className='bg-[#4361ee] text-white text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wider rounded-lg sm:rounded-xl py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 md:px-5 hover:bg-[#324fdb] transition-all cursor-pointer active:scale-95 w-full sm:w-auto'
                                         >
-                                            Batafsil ko'rish
+                                            {t.seeDetails}
                                         </button>
                                     </div>
                                 </div>
@@ -563,17 +707,17 @@ function Dashboard({ onFreightDetail }) {
 
                 <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
                     <div className="flex flex-col sm:flex-row items-center justify-between border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8 gap-3 sm:gap-0">
-                        <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-center sm:text-left'>Real vaqtda xarita</h3>
+                        <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-center sm:text-left'>{t.realTimeMap}</h3>
                         <div className='flex gap-2 sm:gap-3'>
                             <button className='relative text-xs sm:text-sm md:text-base text-white font-semibold bg-[#415fe9] border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-1.5 sm:py-2 px-2 sm:px-4 md:px-6 hover:shadow-xl transform hover:-translate-y-0.5 sm:hover:-translate-y-1 duration-300 cursor-pointer overflow-hidden group'>
                                 <FaSyncAlt className='text-sm sm:text-base' />
-                                <span className='hidden sm:inline'>Yangilash</span>
-                                <span className='sm:hidden'>Yangi</span>
+                                <span className='hidden sm:inline'>{t.update}</span>
+                                <span className='sm:hidden'>{t.update}</span>
                                 <div className="absolute w-0 h-0 rounded-full bg-white/40 group-hover:w-40 group-hover:h-40 duration-500"></div>
                             </button>
                             <button className='relative text-xs sm:text-sm md:text-base text-[#415fe9] font-semibold bg-white border-2 border-blue-500 rounded-lg sm:rounded-xl flex gap-1 sm:gap-2 items-center justify-center py-1.5 sm:py-2 px-2 sm:px-4 md:px-6 hover:bg-[#415fe9] hover:text-white duration-300 cursor-pointer overflow-hidden group'>
                                 <FaFilter className='text-sm sm:text-base' />
-                                <span className='hidden sm:inline'>Filtr</span>
+                                <span className='hidden sm:inline'>{t.filter}</span>
                                 <div className="absolute w-0 h-0 rounded-full bg-white/40 group-hover:w-40 group-hover:h-40 duration-500"></div>
                             </button>
                         </div>
@@ -595,11 +739,11 @@ function Dashboard({ onFreightDetail }) {
 
                 <div className="w-full bg-white shadow-lg border border-white rounded-2xl sm:rounded-3xl hover:border-blue-500 hover:shadow-xl transform hover:-translate-y-1 sm:hover:-translate-y-2 duration-300">
                     <div className="border-b border-gray-300 p-4 sm:p-5 md:p-6 lg:p-8">
-                        <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold'>So'nggi Faoliyat</h3>
+                        <h3 className='text-base sm:text-lg md:text-xl lg:text-2xl font-bold'>{t.recentActivity}</h3>
                     </div>
 
                     <div className="p-3 sm:p-4 md:p-5 lg:p-8 space-y-4 sm:space-y-5">
-                        {recentActivity.length === 0 ? <p className="text-gray-400">Hozircha faollik yo'q</p> : recentActivity.map((item, index) => {
+                        {recentActivity.length === 0 ? <p className="text-gray-400">{t.noActivity}</p> : recentActivity.map((item, index) => {
                             return (
                                 <div key={index} className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 lg:gap-5 items-start sm:items-center">
                                     <item.icon className={`${item.icon_color} text-lg sm:text-xl mt-1 sm:mt-0`} />

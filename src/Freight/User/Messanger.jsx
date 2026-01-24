@@ -16,6 +16,7 @@ import {
   FaSortAmountDown,
   FaSortAmountUp
 } from "react-icons/fa"
+import { CiCircleChevLeft } from "react-icons/ci";
 import Chat from './Chat'
 
 const BASE_HTTP_URL = 'https://tokennoty.pythonanywhere.com/api/'
@@ -183,11 +184,11 @@ const Messanger = () => {
 
   const getUserAvatar = (chat) => {
     const colors = [
-      'bg-gradient-to-br from-blue-500 to-cyan-600',
-      'bg-gradient-to-br from-purple-500 to-pink-600',
-      'bg-gradient-to-br from-green-500 to-emerald-600',
-      'bg-gradient-to-br from-yellow-500 to-orange-600',
-      'bg-gradient-to-br from-red-500 to-pink-600'
+      'bg-linear-to-br from-blue-500 to-cyan-600',
+      'bg-linear-to-br from-purple-500 to-pink-600',
+      'bg-linear-to-br from-green-500 to-emerald-600',
+      'bg-linear-to-br from-yellow-500 to-orange-600',
+      'bg-linear-to-br from-red-500 to-pink-600'
     ]
     const colorIndex = chat.id % colors.length
     return colors[colorIndex]
@@ -198,14 +199,15 @@ const Messanger = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="flex h-screen bg-linear-to-br from-gray-50 to-blue-50">
       {/* Left Sidebar - Chats List */}
       <div className="w-full lg:w-[35%] border-r border-gray-200 bg-white flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
+              <button onClick={()=>history.back()} className='p-2 bg-linear-to-r from-blue-100 to-purple-100 rounded-xl'><CiCircleChevLeft className='text-xl text-blue-600'/> </button>
+              <div className="p-2 bg-linear-to-r from-blue-100 to-purple-100 rounded-xl">
                 <FaComments className="text-blue-600 text-xl" />
               </div>
               <div>
@@ -255,7 +257,7 @@ const Messanger = () => {
             </div>
           ) : filteredAndSortedChats.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-4">
                 <FaEnvelope className="text-blue-400 text-2xl" />
               </div>
               <p className="text-lg font-medium">Chatlar topilmadi</p>
@@ -357,7 +359,7 @@ const Messanger = () => {
           <Chat username={activeChat} />
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-gray-500">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-6">
+            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-6">
               <FaComments className="text-blue-400 text-4xl" />
             </div>
             <h2 className="text-2xl font-bold text-gray-700 mb-2">Suhbatni boshlang</h2>

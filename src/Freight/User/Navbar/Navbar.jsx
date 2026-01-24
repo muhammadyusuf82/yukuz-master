@@ -6,7 +6,6 @@ import { NavLink, Link } from 'react-router-dom';
 import uz from '../../../images/uz.png'
 import ru from '../../../images/ru.png'
 import en from '../../../images/en.png'
-import { img } from 'framer-motion/client';
 
 const translations = {
   uz: {
