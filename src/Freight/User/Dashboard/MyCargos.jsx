@@ -5,18 +5,89 @@ import {
   FaEdit, FaTrash, FaTimes
 } from "react-icons/fa";
 
-const MyCargos = ({ onFreightDetail }) => {
+const translation = {
+  uz: {
+    myCargos: "Men yetkazgan yuklar",
+    myPlacedCargos: "Men joylagan yuklar",
+    totalLoads: "Umumiy yuklar",
+    delivered: "Yetkazilgan",
+    inProgress: "Jarayonda",
+    totalIncome: "Jami daromad",
+    money: " ming",
+    loading: "Yukni yuklash",
+    unloading: "Yukni tushirish",
+    weight: "Og'irlik",
+    size: "Hajm",
+    details: "Batafsil",
+    loadingData: "Ma'lumotlar yuklanmoqda",
+    noCargos: "Yuklaringiz yo'q",
+    noCargosYet: "Hozircha hech qanday yuk topilmadi.",
+    price: "Narxi",
+    desc: "Tavsif",
+    cancel: "Bekor qilish",
+    save: "Saqlash",
+    edit: "Yukni tahrirlash"
+  },
+
+  ru: {
+    myCargos: "Доставленные мной товары",
+    myPlacedCargos: "Багаж, который я положил",
+    totalLoads: "Все грузы",
+    delivered: "Доставлено",
+    inProgress: "В процессе",
+    totalIncome: "Совокупный доход",
+    money: " тысяча",
+    loading: "Погрузка груза",
+    unloading: "Разгрузка",
+    weight: "Масса",
+    size: "Размер",
+    details: "Подробнее",
+    loadingData: "Загрузка данных",
+    noCargos: "У вас нет багажа",
+    noCargosYet: "Груз пока не найден.",
+    price: "Цена",
+    desc: "Описание",
+    cancel: "Отмена",
+    save: "Сохранять",
+    edit: "Редактировать загрузку"
+  },
+
+  en: {
+    myCargos: "The goods I delivered",
+    myPlacedCargos: "The luggage I have placed",
+    totalLoads: "Total loads",
+    delivered: "Delivered",
+    inProgress: "In progress",
+    totalIncome: "Total income",
+    money: " thousand",
+    loading: "Loading cargo",
+    unloading: "Unloading",
+    weight: "Weight",
+    size: "Size",
+    details: "More details",
+    loadingData: "Loading data",
+    noCargos: "You have no luggage",
+    noCargosYet: "No cargo has been found yet.",
+    price: "Price",
+    desc: "Description",
+    cancel: "Cancel",
+    save: "Save",
+    edit: "Edit load"
+  }
+}
+
+const MyCargos = ({ onFreightDetail, currentLang }) => {
   const baseUrl = 'https://tokennoty.pythonanywhere.com/api/freight/?owner__username='
   const [user, setUser] = useState(null)
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
 
+  const t = translation[currentLang || 'uz']
+
   // Tahrirlash modal holatlari
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedFreight, setSelectedFreight] = useState(null)
   const [editFormData, setEditFormData] = useState({})
-
-
 
   const loadData = async () => {
     setLoading(true);
@@ -123,22 +194,22 @@ const MyCargos = ({ onFreightDetail }) => {
 
   const formatMoney = (amount) => {
     if (amount >= 1000000) return (amount / 1000000).toFixed(1).replace(/\.0$/, '') + ' mln';
-    if (amount >= 1000) return (amount / 1000).toFixed(1).replace(/\.0$/, '') + ' ming';
+    if (amount >= 1000) return (amount / 1000).toFixed(1).replace(/\.0$/, '') + t.money;
     return amount;
   };
 
-  const results = useMemo(() => [
-    { id: 1, icon: FaBox, icon_color: '#4361ee', icon_bg: '#eceffd', benefit: true, percent: statistics.percentTotal, total: statistics.totalCount, title: "Umumiy yuklar" },
-    { id: 2, icon: FaCheckCircle, icon_color: '#4cc9f0', icon_bg: '#edf9fd', benefit: true, percent: statistics.percentDelivered, total: statistics.deliveredCount, title: "Yetkazilgan" },
-    { id: 3, icon: FaClock, icon_color: '#ffcc02', icon_bg: '#fff9e6', benefit: statistics.percentInProgress < 50, percent: statistics.percentInProgress, total: statistics.inProgressCount, title: "Jarayonda" },
-    { id: 4, icon: FaWallet, icon_color: '#f72585', icon_bg: '#fee9f3', benefit: true, percent: statistics.percentEarnings, total: formatMoney(statistics.totalEarnings), title: "Jami daromad" },
-  ], [statistics]);
+  const results = [
+    { id: 1, icon: FaBox, icon_color: '#4361ee', icon_bg: '#eceffd', benefit: true, percent: statistics.percentTotal, total: statistics.totalCount, title: t.totalLoads },
+    { id: 2, icon: FaCheckCircle, icon_color: '#4cc9f0', icon_bg: '#edf9fd', benefit: true, percent: statistics.percentDelivered, total: statistics.deliveredCount, title: t.delivered },
+    { id: 3, icon: FaClock, icon_color: '#ffcc02', icon_bg: '#fff9e6', benefit: statistics.percentInProgress < 50, percent: statistics.percentInProgress, total: statistics.inProgressCount, title: t.inProgress },
+    { id: 4, icon: FaWallet, icon_color: '#f72585', icon_bg: '#fee9f3', benefit: true, percent: statistics.percentEarnings, total: formatMoney(statistics.totalEarnings), title: t.totalIncome },
+  ];
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-blue-600 mb-2"></div>
-        <p className="text-gray-500 text-sm font-medium">Ma'lumotlar yuklanmoqda...</p>
+        <p className="text-gray-500 text-sm font-medium">{t.loadingData}...</p>
       </div>
     );
   }
@@ -147,7 +218,7 @@ const MyCargos = ({ onFreightDetail }) => {
     <>
       <div className="bg-gray-50 min-h-screen px-4 pb-10">
         <h1 className="text-2xl font-bold text-blue-900 pt-6">
-          {user?.role === 'driver' ? 'Men yetkazgan yuklar' : 'Men joylagan yuklar'}
+          {user?.role === 'driver' ? t.myCargos : t.myPlacedCargos}
         </h1>
 
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 py-6">
@@ -174,8 +245,8 @@ const MyCargos = ({ onFreightDetail }) => {
         {data.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm">
             <FaInbox className="text-6xl text-gray-200 mb-4" />
-            <h3 className="text-gray-500 font-bold">Yuklaringiz yo'q</h3>
-            <p className="text-gray-400 text-sm">Hozircha hech qanday yuk topilmadi.</p>
+            <h3 className="text-gray-500 font-bold">{t.noCargos}</h3>
+            <p className="text-gray-400 text-sm">{t.noCargosYet}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -198,11 +269,11 @@ const MyCargos = ({ onFreightDetail }) => {
                     </div>
                     <div className="flex flex-col gap-6">
                       <div>
-                        <p className="text-gray-400 text-[10px] font-bold uppercase">Yuklash</p>
+                        <p className="text-gray-400 text-[10px] font-bold uppercase">{t.loading}</p>
                         <p className="text-blue-900 font-semibold">{item.route_starts_where_data?.region || "Noma'lum"}</p>
                       </div>
                       <div>
-                        <p className="text-gray-400 text-[10px] font-bold uppercase">Tushirish</p>
+                        <p className="text-gray-400 text-[10px] font-bold uppercase">{t.unloading}</p>
                         <p className="text-blue-900 font-semibold">{item.route_ends_where_data?.region || "Noma'lum"}</p>
                       </div>
                     </div>
@@ -210,24 +281,24 @@ const MyCargos = ({ onFreightDetail }) => {
 
                   <div className="grid grid-cols-2 gap-3 mb-5">
                     <div className="text-center p-3 bg-blue-50 rounded-xl">
-                      <p className="text-blue-800 font-bold">{item.weight} kg</p>
-                      <p className="text-blue-600 text-[10px] uppercase font-bold">Og'irlik</p>
+                      <p className="text-blue-800 font-bold">{item.weight} {currentLang === 'ru' ? 'кг' : 'kg'}</p>
+                      <p className="text-blue-600 text-[10px] uppercase font-bold">{t.weight}</p>
                     </div>
                     <div className="text-center p-3 bg-blue-50 rounded-xl">
                       <p className="text-blue-800 font-bold">{item.volume} m³</p>
-                      <p className="text-blue-600 text-[10px] uppercase font-bold">Hajm</p>
+                      <p className="text-blue-600 text-[10px] uppercase font-bold">{t.size}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between border-t pt-4">
-                    <p className="text-blue-600 text-xl font-black">
-                      {item.freight_rate_amount ? parseInt(item.freight_rate_amount).toLocaleString() : '0'} soʻm
+                    <p className="text-blue-600 text-xl font-black leading-5">
+                      {item.freight_rate_amount ? parseInt(item.freight_rate_amount).toLocaleString() : '0'} {t.money}
                     </p>
                     <button
                       onClick={() => onFreightDetail('Batafsil', item.id, item)}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all"
                     >
-                      Batafsil
+                      {t.details}
                     </button>
                   </div>
                 </div>
@@ -242,13 +313,13 @@ const MyCargos = ({ onFreightDetail }) => {
             <div className="absolute inset-0 bg-blue-900/40 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)}></div>
             <div className="bg-white rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl animate-in fade-in zoom-in duration-300">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Yukni tahrirlash</h2>
+                <h2 className="text-xl font-bold text-gray-800">{t.edit}</h2>
                 <button onClick={() => setIsEditModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-2"><FaTimes /></button>
               </div>
 
               <form onSubmit={handleUpdate} className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Og'irlik (kg)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">{t.weight} ({currentLang === 'ru' ? 'кг' : 'kg'})</label>
                   <input
                     type="number"
                     value={editFormData.weight}
@@ -257,7 +328,7 @@ const MyCargos = ({ onFreightDetail }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Hajm (m³)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">{t.size} (m³)</label>
                   <input
                     type="text"
                     value={editFormData.volume}
@@ -266,7 +337,7 @@ const MyCargos = ({ onFreightDetail }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Narxi (UZS)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">{t.price} (UZS)</label>
                   <input
                     type="text"
                     value={editFormData.freight_rate_amount}
@@ -275,7 +346,7 @@ const MyCargos = ({ onFreightDetail }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">Tavsif (Uz)</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase ml-1">{t.desc} (Uz)</label>
                   <textarea
                     value={editFormData.description_uz}
                     onChange={(e) => setEditFormData({ ...editFormData, description_uz: e.target.value })}
@@ -284,8 +355,8 @@ const MyCargos = ({ onFreightDetail }) => {
                 </div>
 
                 <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors">Bekor qilish</button>
-                  <button type="submit" className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">Saqlash</button>
+                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-colors">{t.cancel}</button>
+                  <button type="submit" className="flex-1 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">{t.save}</button>
                 </div>
               </form>
             </div>

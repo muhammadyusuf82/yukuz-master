@@ -10,7 +10,7 @@ import Navbar from '../../components/User/Navbar/Navbar';
 import Footer from '../../components/User/Footer/Footer';
 
 import TruckVideo from "../../../videos/TrucksVideo.mp4"
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // 1. BARCHA TARJIMALAR OBYEKTI
 const translations = {
@@ -412,7 +412,13 @@ const Home = () => {
     setOpenId(openId === id ? null : id);
   };
 
+  const navigate = useNavigate()
+
   useEffect(() => {
+    if(localStorage.getItem('token')) {
+      navigate('/freight/asosiy')
+    }
+
     const loadData = async () => {
       try {
         const url = 'https://tokennoty.pythonanywhere.com/api/freight/'

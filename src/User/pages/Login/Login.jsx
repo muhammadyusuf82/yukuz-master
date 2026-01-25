@@ -1001,7 +1001,7 @@ const Login = () => {
             </button>
           </div>
 
-          <div className="p-4 border border-zinc-200 rounded-xl bg-linear-to-r from-zinc-50 to-white shadow-sm">
+          {/* <div className="p-4 border border-zinc-200 rounded-xl bg-linear-to-r from-zinc-50 to-white shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <span className="flex items-center gap-2 text-sm font-medium text-zinc-800">
                 <FaMapMarkerAlt className="text-blue-600 animate-pulse" />
@@ -1020,7 +1020,7 @@ const Login = () => {
                 ) : t('getLocation')}
               </button>
             </div>
-          </div>
+          </div> */}
 
           <div className="flex justify-center items-center gap-x-3 my-4">
             <div className="bg-linear-to-r from-zinc-300 to-transparent h-0.5 flex-1"></div>

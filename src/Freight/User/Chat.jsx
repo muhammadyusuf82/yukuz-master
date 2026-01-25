@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react"
 import { FaPaperPlane, FaUserCircle, FaUser, FaClock, FaCheck, FaCheckDouble } from "react-icons/fa"
 
-const BASE_WEBSOCKET_URL = 'wss://tokennoty.pythonanywhere.com/ws/'
-const BASE_HTTP_URL = 'https://tokennoty.pythonanywhere.com/api/'
+const BASE_WEBSOCKET_URL = 'ws://10.59.148.210:8000/ws/'
+const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
 
 const Chat = ({ username }) => {
     const [messages, setMessages] = useState([])
@@ -10,7 +10,6 @@ const Chat = ({ username }) => {
     const [chatSocket, setChatSocket] = useState(null)
     const [isConnected, setIsConnected] = useState(false)
     const messagesEndRef = useRef(null)
-    const currentUser = JSON.parse(localStorage.getItem('user'))
 
     // for change
 
@@ -52,6 +51,9 @@ const Chat = ({ username }) => {
         // Fetch previous messages
         const fetchMessages = async () => {
             try {
+                const user = await (
+                    await fetch(BASE_HTTP_URL + 'users/', { headers: { Authorization: `Token ${token}` } })
+                ).json()
                 const response = await fetch(BASE_HTTP_URL + `chat-messages/?username=${username}`, {
                     headers: { 
                         'Authorization': `Token ${token}`,
@@ -63,7 +65,7 @@ const Chat = ({ username }) => {
                     const formattedMessages = data.map(e => ({
                         ...e,
                         sent_at: new Date(e.sent_at),
-                        is_you: e.sender_username === currentUser?.username
+                        is_you: e.sender_username === user?.username
                     }))
                     setMessages(formattedMessages.reverse()) // Reverse to show latest at bottom
                 }
@@ -77,7 +79,7 @@ const Chat = ({ username }) => {
         return () => {
             socket.close()
         }
-    }, [username, currentUser])
+    }, [username])
 
     // Scroll to bottom when new messages arrive
     useEffect(() => {
@@ -88,8 +90,13 @@ const Chat = ({ username }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (!inputText.trim() || !chatSocket || !isConnected) return
+
+        const token = localStorage.getItem('token')
+        const user = await (
+            await fetch(BASE_HTTP_URL + 'users/', { headers: { Authorization: `Token ${token}` } })
+        ).json()
 
         const messageData = {
             'text': inputText,
@@ -100,7 +107,7 @@ const Chat = ({ username }) => {
         
         setMessages(prev => [...prev, {
             text: inputText,
-            sender_username: currentUser?.username || 'you',
+            sender_username: user?.username || 'you',
             sent_at: new Date(),
             is_you: true
         }])

@@ -19,7 +19,7 @@ import {
 import { CiCircleChevLeft } from "react-icons/ci";
 import Chat from './Chat'
 
-const BASE_HTTP_URL = 'https://tokennoty.pythonanywhere.com/api/'
+const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
 
 const Messanger = () => {
   const [chats, setChats] = useState([])
@@ -44,7 +44,7 @@ const Messanger = () => {
     try {
       setLoading(true)
       const token = localStorage.getItem('token') || localStorage.getItem('access_token')
-      const currentUser = JSON.parse(localStorage.getItem('user'))
+      const currentUser = await (await fetch(BASE_HTTP_URL + 'users/', { headers: {Authorization: `Token ${token}`}})).json()
       
       if (!token || !currentUser) {
         console.error('User not authenticated')
@@ -55,90 +55,17 @@ const Messanger = () => {
       // In a real app, you would have an endpoint to fetch all chats
       // For now, we'll simulate with a sample data and later integrate with API
       
-      // This is a simulation - replace with actual API call
-      setTimeout(() => {
-        const sampleChats = [
-          {
-            id: 1,
-            username: "john_doe",
-            first_name: "John",
-            last_name: "Doe",
-            last_message: "Yukni qachon olib ketishingiz mumkin?",
-            last_message_time: "2026-01-15T14:30:00Z",
-            unread_count: 3,
-            freight_id: 123,
-            freight_type: "Don mahsulotlari",
-            user_type: "owner"
-          },
-          {
-            id: 2,
-            username: "jane_smith",
-            first_name: "Jane",
-            last_name: "Smith",
-            last_message: "Taklifingizni ko'rib chiqdim, narzni kelishamiz",
-            last_message_time: "2026-01-14T11:20:00Z",
-            unread_count: 0,
-            freight_id: 124,
-            freight_type: "Elektr jihozlari",
-            user_type: "owner"
-          },
-          {
-            id: 3,
-            username: "bob_wilson",
-            first_name: "Bob",
-            last_name: "Wilson",
-            last_message: "Yukni qabul qildim, rahmat!",
-            last_message_time: "2026-01-13T09:15:00Z",
-            unread_count: 1,
-            freight_id: 125,
-            freight_type: "Mebel",
-            user_type: "driver"
-          },
-          {
-            id: 4,
-            username: "alice_johnson",
-            first_name: "Alice",
-            last_name: "Johnson",
-            last_message: "Kechirasiz, yana bir marta taklif berishim mumkinmi?",
-            last_message_time: "2026-01-12T16:45:00Z",
-            unread_count: 0,
-            freight_id: 126,
-            freight_type: "Kiyim-kechak",
-            user_type: "owner"
-          },
-          {
-            id: 5,
-            username: "charlie_brown",
-            first_name: "Charlie",
-            last_name: "Brown",
-            last_message: "Yuk o'lchamlari to'g'rimi?",
-            last_message_time: "2026-01-11T13:10:00Z",
-            unread_count: 5,
-            freight_id: 127,
-            freight_type: "Qurilish materiallari",
-            user_type: "owner"
-          }
-        ]
-        
-        // For demo, if a chat was passed in URL, add it to the list
-        const urlParams = new URLSearchParams(window.location.search)
-        const chatParam = urlParams.get('chat')
-        if (chatParam && !sampleChats.find(c => c.username === chatParam)) {
-          sampleChats.unshift({
-            id: 0,
-            username: chatParam,
-            first_name: "Yangi",
-            last_name: "Foydalanuvchi",
-            last_message: "Yangi chat",
-            last_message_time: new Date().toISOString(),
-            unread_count: 1,
-            freight_id: null,
-            freight_type: "Noma'lum",
-            user_type: "owner"
-          })
-        }
-        
-        setChats(sampleChats)
+      setTimeout(async () => {
+        const res = await (await fetch(BASE_HTTP_URL + 'chats/', {headers: {Authorization: `Token ${token}`}})).json()
+        const chats = res.map(obj =>{
+          let usr
+          if (obj.sender.id == currentUser.id)
+            usr = obj.receiver
+          else
+            usr = obj.sender
+          return usr
+        })
+        setChats(chats)
         setLoading(false)
       }, 1000)
       

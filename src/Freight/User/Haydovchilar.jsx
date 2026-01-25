@@ -35,6 +35,433 @@ import {
   FaRulerVertical
 } from 'react-icons/fa';
 
+// Tarjimalar obyekti
+const translations = {
+  uz: {
+    // Sahifa sarlavhalari
+    pageTitle: "Haydovchilar",
+    pageDescription: "Barcha haydovchilarni boshqaring, kuzating va yuk biriktiring",
+
+    // Statistik kartochkalar
+    totalDrivers: "Jami Haydovchilar",
+    online: "Online",
+    offline: "Offline",
+    verified: "Tasdiqlangan",
+
+    // Qidiruv va filterlar
+    searchPlaceholder: "Haydovchi ismi, ID yoki telefon raqami bo'yicha qidirish...",
+    status: "Holat",
+    vehicle: "Transport",
+    rating: "Reyting",
+    addDriver: "Haydovchi qo'shish",
+
+    // Holatlar
+    allStatuses: "Barcha holatlar",
+    onlineStatus: "Online",
+    offlineStatus: "Offline",
+    busyStatus: "Band",
+
+    // Transport turlari
+    allVehicles: "Barcha transportlar",
+    truck: "Yuk mashinasi",
+    van: "Furgon",
+    pickup: "Pikap",
+    refrigerator: "Refrijerator",
+
+    // Reytinglar
+    allRatings: "Barcha reytinglar",
+    fiveStars: "5 ★",
+    fourPlusStars: "4+ ★",
+    threePlusStars: "3+ ★",
+    twoPlusStars: "2+ ★",
+
+    // Tablar
+    allDrivers: "Barcha haydovchilar",
+    onlineDrivers: "Online",
+    verifiedDrivers: "Tasdiqlangan",
+    availableDrivers: "Bo'sh",
+    topRated: "Top reyting",
+    newlyAdded: "Yangi qo'shilgan",
+
+    // Haydovchi kartasi
+    featured: "Featured",
+    verifiedBadge: "Tasdiqlangan",
+    id: "id",
+    location: "location",
+    phone: "Telefon",
+    vehicleType: "Transport",
+    registered: "Ro'yxatdan o'tgan",
+    statusCol: "Holat",
+    onlineStatusCol: "Online",
+    realTimeLocation: "Real vaqtda joylashuv",
+    completed: "Yakunlangan",
+    active: "Faol",
+    revenue: "Daromad",
+    call: "Qo'ng'iroq",
+    message: "Xabar",
+    assignCargo: "Yuk",
+
+    // Pagination
+    paginationInfo: "1-9 of 156 haydovchilar",
+
+    // Modal - Yangi haydovchi qo'shish
+    addDriverTitle: "Yangi haydovchi qo'shish",
+    driverInfo: "Haydovchi ma'lumotlari",
+    username: "Username",
+    usernameRequired: "Username *",
+    password: "Parol",
+    passwordRequired: "Parol *",
+    firstName: "Ism",
+    firstNameRequired: "Ism *",
+    lastName: "Familiya",
+    lastNameRequired: "Familiya *",
+    vehicleInfo: "Transport ma'lumotlari",
+    vehicleTypeLabel: "Transport turi",
+    select: "Tanlang",
+    bodyType: "Kuzov turi",
+    closedBody: "Yopiq",
+    openBody: "Ochiq",
+    loadingMethod: "Yuklash usuli",
+    topLoading: "Yuqoridan",
+    backLoading: "Orqadan",
+
+    // O'lchamlar
+    dimensions: "O'lchamlari",
+    length: "Uzunlik (m)",
+    height: "Balandlik (m)",
+    width: "Kenglik (m)",
+
+    // Sig'im
+    capacity: "Sig'imi",
+    weight: "Og'irlik (kg)",
+    weightRequired: "Og'irlik (kg) *",
+    availableTonnage: "Mavjud tonnaj",
+    availableVolume: "Mavjud hajm (m³)",
+
+    // Narxlar
+    pricing: "Narxlar",
+    currency: "Valyuta",
+    som: "So'm",
+    pricePerKm: "Narx (1 km uchun)",
+
+    // Rasm
+    photo: "Rasm",
+    vehiclePhoto: "Transport rasmi",
+
+    // Maxfiylik sozlamasi
+    publicTransport: "Ommaviy transport",
+    publicTransportDesc: "Bu transport barcha foydalanuvchilar uchun ko'rinadi",
+
+    // Amallar
+    cancel: "Bekor qilish",
+    save: "Saqlash",
+
+    // Haydovchi ma'lumotlari modal
+    driverDetails: " ma'lumotlar",
+    email: "Email",
+
+    // Yuk biriktirish modal
+    assignCargoTitle: " ga yuk biriktirish",
+    selectCargo: "Yukni tanlang",
+    selectCargoPlaceholder: "Yukni tanlang...",
+    additionalInfo: "Qo'shimcha ma'lumot",
+    additionalInfoPlaceholder: "Haydovchiga qo'shimcha ko'rsatmalar...",
+
+    // Xabarnoma
+    driverAdded: "Yangi haydovchi qo'shildi!",
+
+    // Transport kategoriyalari
+    container: "Konteyner",
+    platform: "Platforma",
+    tanker: "Sisterna",
+
+    // Xatoliklar
+    unknown: "Noma'lum"
+  },
+  ru: {
+    // Sahifa sarlavhalari
+    pageTitle: "Водители",
+    pageDescription: "Управляйте, отслеживайте и назначайте грузы всем водителям",
+
+    // Statistik kartochkalar
+    totalDrivers: "Всего водителей",
+    online: "Онлайн",
+    offline: "Офлайн",
+    verified: "Подтверждено",
+
+    // Qidiruv va filterlar
+    searchPlaceholder: "Поиск по имени водителя, ID или номеру телефона...",
+    status: "Статус",
+    vehicle: "Транспорт",
+    rating: "Рейтинг",
+    addDriver: "Добавить водителя",
+
+    // Holatlar
+    allStatuses: "Все статусы",
+    onlineStatus: "Онлайн",
+    offlineStatus: "Офлайн",
+    busyStatus: "Занят",
+
+    // Transport turlari
+    allVehicles: "Все виды транспорта",
+    truck: "Грузовик",
+    van: "Фургон",
+    pickup: "Пикап",
+    refrigerator: "Рефрижератор",
+
+    // Reytinglar
+    allRatings: "Все рейтинги",
+    fiveStars: "5 ★",
+    fourPlusStars: "4+ ★",
+    threePlusStars: "3+ ★",
+    twoPlusStars: "2+ ★",
+
+    // Tablar
+    allDrivers: "Все водители",
+    onlineDrivers: "Онлайн",
+    verifiedDrivers: "Подтвержденные",
+    availableDrivers: "Свободные",
+    topRated: "Лучшие по рейтингу",
+    newlyAdded: "Новые",
+
+    // Haydovchi kartasi
+    featured: "Рекомендуемый",
+    verifiedBadge: "Подтверждено",
+    id: "ид",
+    location: "локация",
+    phone: "Телефон",
+    vehicleType: "Транспорт",
+    registered: "Зарегистрирован",
+    statusCol: "Статус",
+    onlineStatusCol: "Онлайн",
+    realTimeLocation: "Местоположение в реальном времени",
+    completed: "Завершено",
+    active: "Активно",
+    revenue: "Доход",
+    call: "Позвонить",
+    message: "Сообщение",
+    assignCargo: "Груз",
+
+    // Pagination
+    paginationInfo: "1-9 из 156 водителей",
+
+    // Modal - Yangi haydovchi qo'shish
+    addDriverTitle: "Добавить нового водителя",
+    driverInfo: "Информация о водителе",
+    username: "Имя пользователя",
+    usernameRequired: "Имя пользователя *",
+    password: "Пароль",
+    passwordRequired: "Пароль *",
+    firstName: "Имя",
+    firstNameRequired: "Имя *",
+    lastName: "Фамилия",
+    lastNameRequired: "Фамилия *",
+    vehicleInfo: "Информация о транспорте",
+    vehicleTypeLabel: "Тип транспорта",
+    select: "Выберите",
+    bodyType: "Тип кузова",
+    closedBody: "Закрытый",
+    openBody: "Открытый",
+    loadingMethod: "Способ загрузки",
+    topLoading: "Сверху",
+    backLoading: "Сзади",
+
+    // O'lchamlar
+    dimensions: "Размеры",
+    length: "Длина (м)",
+    height: "Высота (м)",
+    width: "Ширина (м)",
+
+    // Sig'im
+    capacity: "Вместимость",
+    weight: "Вес (кг)",
+    weightRequired: "Вес (кг) *",
+    availableTonnage: "Доступный тоннаж",
+    availableVolume: "Доступный объем (м³)",
+
+    // Narxlar
+    pricing: "Цены",
+    currency: "Валюта",
+    som: "Сум",
+    pricePerKm: "Цена (за 1 км)",
+
+    // Rasm
+    photo: "Фото",
+    vehiclePhoto: "Фото транспорта",
+
+    // Maxfiylik sozlamasi
+    publicTransport: "Публичный транспорт",
+    publicTransportDesc: "Этот транспорт виден всем пользователям",
+
+    // Amallar
+    cancel: "Отмена",
+    save: "Сохранить",
+
+    // Haydovchi ma'lumotlari modal
+    driverDetails: " информация",
+    email: "Email",
+
+    // Yuk biriktirish modal
+    assignCargoTitle: " назначить груз",
+    selectCargo: "Выберите груз",
+    selectCargoPlaceholder: "Выберите груз...",
+    additionalInfo: "Дополнительная информация",
+    additionalInfoPlaceholder: "Дополнительные инструкции для водителя...",
+
+    // Xabarnoma
+    driverAdded: "Новый водитель добавлен!",
+
+    // Transport kategoriyalari
+    container: "Контейнер",
+    platform: "Платформа",
+    tanker: "Цистерна",
+
+    // Xatoliklar
+    unknown: "Неизвестно"
+  },
+  en: {
+    // Sahifa sarlavhalari
+    pageTitle: "Drivers",
+    pageDescription: "Manage, track and assign cargo to all drivers",
+
+    // Statistik kartochkalar
+    totalDrivers: "Total Drivers",
+    online: "Online",
+    offline: "Offline",
+    verified: "Verified",
+
+    // Qidiruv va filterlar
+    searchPlaceholder: "Search by driver name, ID or phone number...",
+    status: "Status",
+    vehicle: "Vehicle",
+    rating: "Rating",
+    addDriver: "Add Driver",
+
+    // Holatlar
+    allStatuses: "All Statuses",
+    onlineStatus: "Online",
+    offlineStatus: "Offline",
+    busyStatus: "Busy",
+
+    // Transport turlari
+    allVehicles: "All Vehicles",
+    truck: "Truck",
+    van: "Van",
+    pickup: "Pickup",
+    refrigerator: "Refrigerator",
+
+    // Reytinglar
+    allRatings: "All Ratings",
+    fiveStars: "5 ★",
+    fourPlusStars: "4+ ★",
+    threePlusStars: "3+ ★",
+    twoPlusStars: "2+ ★",
+
+    // Tablar
+    allDrivers: "All Drivers",
+    onlineDrivers: "Online",
+    verifiedDrivers: "Verified",
+    availableDrivers: "Available",
+    topRated: "Top Rated",
+    newlyAdded: "Newly Added",
+
+    // Haydovchi kartasi
+    featured: "Featured",
+    verifiedBadge: "Verified",
+    id: "id",
+    location: "location",
+    phone: "Phone",
+    vehicleType: "Vehicle",
+    registered: "Registered",
+    statusCol: "Status",
+    onlineStatusCol: "Online",
+    realTimeLocation: "Real-time location",
+    completed: "Completed",
+    active: "Active",
+    revenue: "Revenue",
+    call: "Call",
+    message: "Message",
+    assignCargo: "Cargo",
+
+    // Pagination
+    paginationInfo: "1-9 of 156 drivers",
+
+    // Modal - Yangi haydovchi qo'shish
+    addDriverTitle: "Add New Driver",
+    driverInfo: "Driver Information",
+    username: "Username",
+    usernameRequired: "Username *",
+    password: "Password",
+    passwordRequired: "Password *",
+    firstName: "First Name",
+    firstNameRequired: "First Name *",
+    lastName: "Last Name",
+    lastNameRequired: "Last Name *",
+    vehicleInfo: "Vehicle Information",
+    vehicleTypeLabel: "Vehicle Type",
+    select: "Select",
+    bodyType: "Body Type",
+    closedBody: "Closed",
+    openBody: "Open",
+    loadingMethod: "Loading Method",
+    topLoading: "Top",
+    backLoading: "Back",
+
+    // O'lchamlar
+    dimensions: "Dimensions",
+    length: "Length (m)",
+    height: "Height (m)",
+    width: "Width (m)",
+
+    // Sig'im
+    capacity: "Capacity",
+    weight: "Weight (kg)",
+    weightRequired: "Weight (kg) *",
+    availableTonnage: "Available Tonnage",
+    availableVolume: "Available Volume (m³)",
+
+    // Narxlar
+    pricing: "Pricing",
+    currency: "Currency",
+    som: "UZS",
+    pricePerKm: "Price (per 1 km)",
+
+    // Rasm
+    photo: "Photo",
+    vehiclePhoto: "Vehicle Photo",
+
+    // Maxfiylik sozlamasi
+    publicTransport: "Public Transport",
+    publicTransportDesc: "This vehicle is visible to all users",
+
+    // Amallar
+    cancel: "Cancel",
+    save: "Save",
+
+    // Haydovchi ma'lumotlari modal
+    driverDetails: " Information",
+    email: "Email",
+
+    // Yuk biriktirish modal
+    assignCargoTitle: " Assign Cargo",
+    selectCargo: "Select Cargo",
+    selectCargoPlaceholder: "Select cargo...",
+    additionalInfo: "Additional Information",
+    additionalInfoPlaceholder: "Additional instructions for driver...",
+
+    // Xabarnoma
+    driverAdded: "New driver added!",
+
+    // Transport kategoriyalari
+    container: "Container",
+    platform: "Platform",
+    tanker: "Tanker",
+
+    // Xatoliklar
+    unknown: "Unknown"
+  }
+};
+
 // Simple Star Rating Component
 function StarRating({ rating }) {
   return (
@@ -51,7 +478,7 @@ function StarRating({ rating }) {
 }
 
 // Stat Card Component - Now extracted
-function StatCard({ title, value, trend, trendUp, icon: Icon, gradient }) {
+function StatCard({ title, value, trend, trendUp, icon: Icon, gradient, t }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 relative overflow-hidden transition-all hover:-translate-y-2 duration-300 hover:shadow-xl">
       <div className={`absolute top-0 left-0 right-0 h-1 bg-linear-to-r ${gradient}`} />
@@ -73,7 +500,7 @@ function StatCard({ title, value, trend, trendUp, icon: Icon, gradient }) {
 function Select({ options, label, value, onChange }) {
   return (
     <div className="relative">
-      <select 
+      <select
         className="py-3 px-4 border border-gray-300 rounded-xl text-sm bg-white text-gray-700 cursor-pointer appearance-none pr-10 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 w-full"
         value={value}
         onChange={onChange}
@@ -113,30 +540,30 @@ function Modal({ isOpen, title, children, onClose }) {
 }
 
 // Driver Card Component
-function DriverCard({ driver }) {
+function DriverCard({ driver, t }) {
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
       {/* Featured Badge */}
-      <div className="absolute top-4 right-4 bg-linear-to-r from-blue-600 to-purple-700 text-white text-xs font-semibold py-1 px-3 rounded-xl z-10">Featured</div>
+      <div className="absolute top-4 right-4 bg-linear-to-r from-blue-600 to-purple-700 text-white text-xs font-semibold py-1 px-3 rounded-xl z-10">{t.featured}</div>
 
       {/* Driver Info */}
       <div className="p-6 border-b border-gray-100 flex items-start gap-4">
         <div className="relative">
           <div className="w-20 h-20 bg-linear-to-br from-blue-600 to-purple-700 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-sm">
-            {driver.owner_first_name.charAt(0)}{driver.owner_last_name.charAt(0)}
+            {driver.owner_first_name?.charAt(0) || 'D'}{driver.owner_last_name?.charAt(0) || 'D'}
           </div>
           <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-white bg-green-500"></div>
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-xl font-bold text-gray-900">{driver.owner_first_name} {driver.owner_last_name}</h3>
-            <FaCheckCircle className="text-green-500 w-4 h-4" title="Tasdiqlangan" />
+            <h3 className="text-xl font-bold text-gray-900">{driver.owner_first_name || t.unknown} {driver.owner_last_name || t.unknown}</h3>
+            <FaCheckCircle className="text-green-500 w-4 h-4" title={t.verifiedBadge} />
           </div>
           <StarRating rating={driver.rating} />
-          <div className="font-mono text-sm text-gray-500 mb-2">id</div>
+          <div className="font-mono text-sm text-gray-500 mb-2">{t.id}</div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <FaMapMarkerAlt className="text-blue-600 w-3 h-3" />
-            location
+            {t.location}
           </div>
         </div>
       </div>
@@ -145,21 +572,21 @@ function DriverCard({ driver }) {
       <div className="p-4 border-b border-gray-100">
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Telefon</div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.phone}</div>
             <div className="font-semibold text-gray-900 font-mono">+998992221133</div>
             {/* {console.log(driver)} */}
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Transport</div>
-            <div className="font-semibold text-gray-900">{driver.vehicle_category}</div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.vehicleType}</div>
+            <div className="font-semibold text-gray-900">{driver.vehicle_category || t.unknown}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Ro'yxatdan o'tgan</div>
-            <div className="font-semibold text-gray-900">{driver.created_at.split('T')[0]}</div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.registered}</div>
+            <div className="font-semibold text-gray-900">{driver.created_at?.split('T')[0] || t.unknown}</div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Holat</div>
-            <div className="font-semibold text-gray-900">Online</div>
+            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.statusCol}</div>
+            <div className="font-semibold text-gray-900">{t.onlineStatusCol}</div>
           </div>
         </div>
 
@@ -171,7 +598,7 @@ function DriverCard({ driver }) {
           <div className="absolute inset-0 flex items-center justify-center text-gray-600">
             <div className="text-center">
               <FaMapMarkedAlt className="text-4xl mb-2 mx-auto" />
-              <div>Real vaqtda joylashuv</div>
+              <div>{t.realTimeLocation}</div>
             </div>
           </div>
         </div>
@@ -181,28 +608,28 @@ function DriverCard({ driver }) {
       <div className="p-4 grid grid-cols-3 gap-4 text-center bg-gray-50">
         <div>
           <div className="text-xl font-bold text-blue-600">89</div>
-          <div className="text-xs text-gray-500 uppercase tracking-wider">Yakunlangan</div>
+          <div className="text-xs text-gray-500 uppercase tracking-wider">{t.completed}</div>
         </div>
         <div>
           <div className="text-xl font-bold text-blue-600">1</div>
-          <div className="text-xs text-gray-500 uppercase tracking-wider">Faol</div>
+          <div className="text-xs text-gray-500 uppercase tracking-wider">{t.active}</div>
         </div>
         <div>
           <div className="text-xl font-bold text-blue-600">12.5M</div>
-          <div className="text-xs text-gray-500 uppercase tracking-wider">Daromad</div>
+          <div className="text-xs text-gray-500 uppercase tracking-wider">{t.revenue}</div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="p-4 flex gap-3">
         <button className="flex-1 py-3 border border-gray-300 rounded-xl font-semibold text-sm hover:text-white hover:border-green-500 hover:bg-green-500 transition-all flex items-center justify-center gap-2">
-          <FaPhone className="w-4 h-4" />Qo'ng'iroq
+          <FaPhone className="w-4 h-4" />{t.call}
         </button>
         <button className="flex-1 py-3 border border-gray-300 rounded-xl font-semibold text-sm hover:text-white hover:border-blue-500 hover:bg-blue-500 transition-all flex items-center justify-center gap-2">
-          <FaComment className="w-4 h-4" />Xabar
+          <FaComment className="w-4 h-4" />{t.message}
         </button>
         <button className="flex-1 py-3 border border-gray-300 rounded-xl font-semibold text-sm hover:text-white hover:border-purple-500 hover:bg-purple-500 transition-all flex items-center justify-center gap-2">
-          <FaTruckLoading className="w-4 h-4" />Yuk
+          <FaTruckLoading className="w-4 h-4" />{t.assignCargo}
         </button>
       </div>
     </div>
@@ -210,7 +637,8 @@ function DriverCard({ driver }) {
 }
 
 // Main Component
-function Haydovchilar() {
+function Haydovchilar({ currentLang }) {
+  const t = translations[currentLang || 'uz'];
   const [activeTab, setActiveTab] = useState('all');
   const [showDriverModal, setShowDriverModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -270,58 +698,58 @@ function Haydovchilar() {
 
   // Status options
   const statusOptions = [
-    { value: 'all', label: 'Barcha holatlar' },
-    { value: 'online', label: 'Online' },
-    { value: 'offline', label: 'Offline' },
-    { value: 'busy', label: 'Band' }
+    { value: 'all', label: t.allStatuses },
+    { value: 'online', label: t.onlineStatus },
+    { value: 'offline', label: t.offlineStatus },
+    { value: 'busy', label: t.busyStatus }
   ];
 
   // Vehicle options
   const vehicleOptions = [
-    { value: 'all', label: 'Barcha transportlar' },
-    { value: 'truck', label: 'Yuk mashinasi' },
-    { value: 'van', label: 'Furgon' },
-    { value: 'pickup', label: 'Pikap' },
-    { value: 'refrigerator', label: 'Refrijerator' }
+    { value: 'all', label: t.allVehicles },
+    { value: 'truck', label: t.truck },
+    { value: 'van', label: t.van },
+    { value: 'pickup', label: t.pickup },
+    { value: 'refrigerator', label: t.refrigerator }
   ];
 
   // Vehicle category options for form
   const vehicleCategoryOptions = [
-    { value: '', label: 'Tanlang' },
-    { value: 'truck', label: 'Yuk mashinasi' },
-    { value: 'van', label: 'Furgon' },
-    { value: 'refrigerator', label: 'Refrijerator' },
-    { value: 'container', label: 'Konteyner' },
-    { value: 'platform', label: 'Platforma' },
-    { value: 'tanker', label: 'Sisterna' }
+    { value: '', label: t.select },
+    { value: 'truck', label: t.truck },
+    { value: 'van', label: t.van },
+    { value: 'refrigerator', label: t.refrigerator },
+    { value: 'container', label: t.container },
+    { value: 'platform', label: t.platform },
+    { value: 'tanker', label: t.tanker }
   ];
 
   // Body type options
   const bodyTypeOptions = [
-    { value: '', label: 'Tanlang' },
-    { value: 'closed', label: 'Yopiq' },
-    { value: 'open', label: 'Ochiq' },
+    { value: '', label: t.select },
+    { value: 'closed', label: t.closedBody },
+    { value: 'open', label: t.openBody },
   ];
 
   // Loading method options
   const loadingMethodOptions = [
-    { value: '', label: 'Tanlang' },
-    { value: 'top', label: 'Yuqoridan' },
-    { value: 'back', label: 'Orqadan' },
+    { value: '', label: t.select },
+    { value: 'top', label: t.topLoading },
+    { value: 'back', label: t.backLoading },
   ];
 
   // Currency options
   const currencyOptions = [
-    { value: 'UZS', label: "So'm" },
+    { value: 'UZS', label: t.som },
   ];
 
   // Rating options
   const ratingOptions = [
-    { value: 'all', label: 'Barcha reytinglar' },
-    { value: '5', label: '5 ★' },
-    { value: '4', label: '4+ ★' },
-    { value: '3', label: '3+ ★' },
-    { value: '2', label: '2+ ★' }
+    { value: 'all', label: t.allRatings },
+    { value: '5', label: t.fiveStars },
+    { value: '4', label: t.fourPlusStars },
+    { value: '3', label: t.threePlusStars },
+    { value: '2', label: t.twoPlusStars }
   ];
 
   const handleAddDriver = async () => {
@@ -349,7 +777,7 @@ function Haydovchilar() {
     };
 
     console.log('Form data to be posted:', formData);
-    
+
     const token = localStorage.getItem('token');
     try {
       const datab = JSON.stringify(formData)
@@ -364,9 +792,9 @@ function Haydovchilar() {
 
       if (response.ok) {
         alert("Yuk muvaffaqiyatli qo'shildi!");
-        onRefresh(); // Ro'yxatni yangilash
-        onClose();   // Modalni yopish
-        }
+        // Ro'yxatni yangilash
+        // Modalni yopish
+      }
     } catch (err) {
       console.error("Tarmoq xatosi:", err);
       // alert("Server bilan aloqa yo'q yoki internet past.");
@@ -388,11 +816,11 @@ function Haydovchilar() {
     setWeight('');
     setVehicleCategory('');
     setLoadingMethod('');
-    setTransportationRateCurrency('USD');
+    setTransportationRateCurrency('UZS');
     setTransportationRatePerKm('');
     setIsPublic(false);
     setPhoto(null);
-    
+
     // Hide notification after 3 seconds
     setTimeout(() => setShowNotification(false), 3000);
   };
@@ -406,21 +834,20 @@ function Haydovchilar() {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50/10 to-purple-50/10 font-sans text-gray-800">
-      <Navbar />
       <main className="py-12">
         <div className="container mx-auto px-6">
           {/* Header */}
           <div className="mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">Haydovchilar</h1>
-            <p className="text-gray-600 text-lg">Barcha haydovchilarni boshqaring, kuzating va yuk biriktiring</p>
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">{t.pageTitle}</h1>
+            <p className="text-gray-600 text-lg">{t.pageDescription}</p>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <StatCard title="Jami Haydovchilar" value={transportData.length} trend="15%" trendUp={true} icon={FaUsers} gradient="from-blue-600 to-purple-700" />
-            <StatCard title="Online" value="0" trend="8%" trendUp={true} icon={FaWifi} gradient="from-cyan-400 to-cyan-500" />
-            <StatCard title="Offline" value="0" trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" />
-            <StatCard title="Tasdiqlangan" value={transportData.length} trend="24%" trendUp={true} icon={FaCheckCircle} gradient="from-purple-700 to-blue-600" />
+            <StatCard title={t.totalDrivers} value={transportData.length} trend="15%" trendUp={true} icon={FaUsers} gradient="from-blue-600 to-purple-700" t={t} />
+            <StatCard title={t.online} value="0" trend="8%" trendUp={true} icon={FaWifi} gradient="from-cyan-400 to-cyan-500" t={t} />
+            <StatCard title={t.offline} value="0" trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" t={t} />
+            <StatCard title={t.verified} value={transportData.length} trend="24%" trendUp={true} icon={FaCheckCircle} gradient="from-purple-700 to-blue-600" t={t} />
           </div>
 
           {/* Search and Filters */}
@@ -428,42 +855,42 @@ function Haydovchilar() {
             <div className="flex-1 max-lg:min-w-2/3">
               <div className="relative">
                 <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input type="text" className="min-w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100" placeholder="Haydovchi ismi, ID yoki telefon raqami bo'yicha qidirish..." />
+                <input type="text" className="min-w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl text-sm transition-all focus:outline-none focus:border-blue-600 focus:ring-3 focus:ring-blue-100" placeholder={t.searchPlaceholder} />
               </div>
             </div>
             <div className="flex flex-wrap gap-3">
-              <div className="min-w-50"><Select options={statusOptions} label="Holat" /></div>
-              <div className="min-w-50"><Select options={vehicleOptions} label="Transport" /></div>
-              <div className="min-w-50"><Select options={ratingOptions} label="Reyting" /></div>
-              <button 
+              <div className="min-w-50"><Select options={statusOptions} label={t.status} /></div>
+              <div className="min-w-50"><Select options={vehicleOptions} label={t.vehicle} /></div>
+              <div className="min-w-50"><Select options={ratingOptions} label={t.rating} /></div>
+              <button
                 className="bg-linear-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center gap-2 hover:shadow-lg hover:-translate-y-0.5 transition-all"
                 onClick={() => setShowAddDriverModal(true)}
               >
-                <FaPlus />Haydovchi qo'shish
+                <FaPlus />{t.addDriver}
               </button>
             </div>
           </div>
 
           {/* Tabs */}
           <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
-            <Tab id="all" label="Barcha haydovchilar" active={activeTab === 'all'} />
-            <Tab id="online" label="Online"  active={activeTab === 'online'} />
-            <Tab id="verified" label="Tasdiqlangan" active={activeTab === 'verified'} />
-            <Tab id="available" label="Bo'sh"  active={activeTab === 'available'} />
-            <Tab id="top" label="Top reyting" active={activeTab === 'top'} />
-            <Tab id="new" label="Yangi qo'shilgan" active={activeTab === 'new'} />
+            <Tab id="all" label={t.allDrivers} active={activeTab === 'all'} />
+            <Tab id="online" label={t.onlineDrivers} active={activeTab === 'online'} />
+            <Tab id="verified" label={t.verifiedDrivers} active={activeTab === 'verified'} />
+            <Tab id="available" label={t.availableDrivers} active={activeTab === 'available'} />
+            <Tab id="top" label={t.topRated} active={activeTab === 'top'} />
+            <Tab id="new" label={t.newlyAdded} active={activeTab === 'new'} />
           </div>
 
           {/* Drivers Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
             {transportData.map(driver => (
-              <DriverCard key={driver.id} driver={driver} />
+              <DriverCard key={driver.id} driver={driver} t={t} />
             ))}
           </div>
 
           {/* Pagination */}
           <div className="bg-white rounded-2xl shadow-md p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="text-sm text-gray-600">1-9 of 156 haydovchilar</div>
+            <div className="text-sm text-gray-600">{t.paginationInfo}</div>
             <div className="flex items-center gap-2">
               <button className="w-9 h-9 border border-gray-300 rounded-xl bg-white text-gray-600 flex items-center justify-center hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"><FaChevronLeft /></button>
               <button className="w-9 h-9 border rounded-xl flex items-center justify-center bg-blue-600 text-white border-blue-600 transition-all">1</button>
@@ -478,32 +905,32 @@ function Haydovchilar() {
       </main>
 
       {/* Add Driver Modal */}
-      <Modal isOpen={showAddDriverModal} title="Yangi haydovchi qo'shish" onClose={() => setShowAddDriverModal(false)}>
+      <Modal isOpen={showAddDriverModal} title={t.addDriverTitle} onClose={() => setShowAddDriverModal(false)}>
         <div className="space-y-4">
           {/* Owner Information */}
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaUser className="w-4 h-4" />
-              Haydovchi ma'lumotlari
+              {t.driverInfo}
             </h4>
             <div className="grid grid-cols-2 gap-3">
-            <div className='my-2'>
-                <label className="block text-xs text-gray-500 mb-1">Username *</label>
+              <div className='my-2'>
+                <label className="block text-xs text-gray-500 mb-1">{t.usernameRequired}</label>
                 <input
                   type="text"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Username"
+                  placeholder={t.username}
                   value={ownerUsername}
                   onChange={(e) => setOwnerUsername(e.target.value)}
                   required
                 />
               </div>
               <div className='my-2'>
-                <label className="block text-xs text-gray-500 mb-1">Password *</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.passwordRequired}</label>
                 <input
                   type="password"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Parol"
+                  placeholder={t.password}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -512,49 +939,39 @@ function Haydovchilar() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Ism *</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.firstNameRequired}</label>
                 <input
                   type="text"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Ism"
+                  placeholder={t.firstName}
                   value={ownerFirstName}
                   onChange={(e) => setOwnerFirstName(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Familiya *</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.lastNameRequired}</label>
                 <input
                   type="text"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Familiya"
+                  placeholder={t.lastName}
                   value={ownerLastName}
                   onChange={(e) => setOwnerLastName(e.target.value)}
                   required
                 />
               </div>
             </div>
-            {/* <div className="mt-3">
-              <label className="block text-xs text-gray-500 mb-1">Foydalanuvchi nomi</label>
-              <input
-                type="text"
-                className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                placeholder="admin"
-                value={ownerUsername}
-                onChange={(e) => setOwnerUsername(e.target.value)}
-              />
-            </div> */}
           </div>
 
           {/* Vehicle Information */}
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaTruck className="w-4 h-4" />
-              Transport ma'lumotlari
+              {t.vehicleInfo}
             </h4>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Transport turi</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.vehicleTypeLabel}</label>
                 <Select
                   options={vehicleCategoryOptions}
                   value={vehicleCategory}
@@ -562,7 +979,7 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Kuzov turi</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.bodyType}</label>
                 <Select
                   options={bodyTypeOptions}
                   value={bodyType}
@@ -570,7 +987,7 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Yuklash usuli</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.loadingMethod}</label>
                 <Select
                   options={loadingMethodOptions}
                   value={loadingMethod}
@@ -584,12 +1001,12 @@ function Haydovchilar() {
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaRulerCombined className="w-4 h-4" />
-              O'lchamlari
+              {t.dimensions}
             </h4>
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                  <FaRulerHorizontal className="w-3 h-3" /> Uzunlik (m)
+                  <FaRulerHorizontal className="w-3 h-3" /> {t.length}
                 </label>
                 <input
                   type="number"
@@ -602,7 +1019,7 @@ function Haydovchilar() {
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 flex items-center gap-1">
-                  <FaRulerVertical className="w-3 h-3" /> Balandlik (m)
+                  <FaRulerVertical className="w-3 h-3" /> {t.height}
                 </label>
                 <input
                   type="number"
@@ -614,7 +1031,7 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Kenglik (m)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.width}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -631,11 +1048,11 @@ function Haydovchilar() {
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaWeight className="w-4 h-4" />
-              Sig'imi
+              {t.capacity}
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Og'irlik (kg) *</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.weightRequired}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -647,23 +1064,23 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Mavjud tonnaj</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.availableTonnage}</label>
                 <input
                   type="number"
                   step="0.01"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Tonnaj"
+                  placeholder={t.availableTonnage}
                   value={availableTonnage}
                   onChange={(e) => setAvailableTonnage(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Mavjud hajm (m³)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.availableVolume}</label>
                 <input
                   type="number"
                   step="0.01"
                   className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  placeholder="Hajm"
+                  placeholder={t.availableVolume}
                   value={availableVolume}
                   onChange={(e) => setAvailableVolume(e.target.value)}
                 />
@@ -675,11 +1092,11 @@ function Haydovchilar() {
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaDollarSign className="w-4 h-4" />
-              Narxlar
+              {t.pricing}
             </h4>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Valyuta</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.currency}</label>
                 <Select
                   options={currencyOptions}
                   value={transportationRateCurrency}
@@ -687,7 +1104,7 @@ function Haydovchilar() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Narx (1 km uchun)</label>
+                <label className="block text-xs text-gray-500 mb-1">{t.pricePerKm}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -704,10 +1121,10 @@ function Haydovchilar() {
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <FaCube className="w-4 h-4" />
-              Rasm
+              {t.photo}
             </h4>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Transport rasmi</label>
+              <label className="block text-xs text-gray-500 mb-1">{t.vehiclePhoto}</label>
               <input
                 type="file"
                 className="w-full p-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
@@ -720,8 +1137,8 @@ function Haydovchilar() {
           {/* Privacy Setting */}
           <div className="flex items-center justify-between p-3 border border-gray-200 rounded-xl">
             <div>
-              <div className="font-medium text-sm text-gray-700">Ommaviy transport</div>
-              <div className="text-xs text-gray-500">Bu transport barcha foydalanuvchilar uchun ko'rinadi</div>
+              <div className="font-medium text-sm text-gray-700">{t.publicTransport}</div>
+              <div className="text-xs text-gray-500">{t.publicTransportDesc}</div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -730,7 +1147,7 @@ function Haydovchilar() {
                 checked={isPublic}
                 onChange={(e) => setIsPublic(e.target.checked)}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left:0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
           </div>
 
@@ -740,20 +1157,20 @@ function Haydovchilar() {
               className="flex-1 py-3 border border-gray-300 rounded-xl font-semibold text-sm hover:bg-gray-50 transition-all"
               onClick={() => setShowAddDriverModal(false)}
             >
-              Bekor qilish
+              {t.cancel}
             </button>
             <button
               className="flex-1 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all"
               onClick={handleAddDriver}
             >
-              Saqlash
+              {t.save}
             </button>
           </div>
         </div>
       </Modal>
 
       {/* Driver Details Modal */}
-      <Modal isOpen={showDriverModal} title="John Doe - Ma'lumotlar" onClose={() => setShowDriverModal(false)} >
+      <Modal isOpen={showDriverModal} title={`John Doe ${t.driverDetails}`} onClose={() => setShowDriverModal(false)} >
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -767,33 +1184,33 @@ function Haydovchilar() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="text-xs text-gray-500 mb-1">Telefon</div>
+              <div className="text-xs text-gray-500 mb-1">{t.phone}</div>
               <div className="font-semibold">+99890 123 45 67</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Email</div>
+              <div className="text-xs text-gray-500 mb-1">{t.email}</div>
               <div className="font-semibold">john.doe@example.com</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Joylashuv</div>
+              <div className="text-xs text-gray-500 mb-1">{t.location}</div>
               <div className="font-semibold">Toshkent, Yunusobod</div>
             </div>
             <div>
-              <div className="text-xs text-gray-500 mb-1">Status</div>
-              <div className="font-semibold">Online</div>
+              <div className="text-xs text-gray-500 mb-1">{t.statusCol}</div>
+              <div className="font-semibold">{t.onlineStatusCol}</div>
             </div>
           </div>
         </div>
       </Modal>
 
       {/* Assign Load Modal */}
-      <Modal isOpen={showAssignModal} title="John Doe ga yuk biriktirish" onClose={() => setShowAssignModal(false)}>
+      <Modal isOpen={showAssignModal} title={`John Doe${t.assignCargoTitle}`} onClose={() => setShowAssignModal(false)}>
         <div className="space-y-4">
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Yukni tanlang</label>
+            <label className="block font-medium text-gray-700 mb-2">{t.selectCargo}</label>
             <Select
               options={[
-                { value: '', label: 'Yukni tanlang...' },
+                { value: '', label: t.selectCargoPlaceholder },
                 { value: 'load1', label: 'YUK-2024-001 - Toshkent → Samarqand' },
                 { value: 'load2', label: 'YUK-2024-004 - Buxoro → Navoiy' },
                 { value: 'load3', label: 'YUK-2024-008 - Toshkent → Nukus' }
@@ -801,8 +1218,8 @@ function Haydovchilar() {
             />
           </div>
           <div>
-            <label className="block font-medium text-gray-700 mb-2">Qo'shimcha ma'lumot</label>
-            <textarea className="w-full p-3 border border-gray-300 rounded-xl font-sans resize-none focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" rows="3" placeholder="Haydovchiga qo'shimcha ko'rsatmalar..." />
+            <label className="block font-medium text-gray-700 mb-2">{t.additionalInfo}</label>
+            <textarea className="w-full p-3 border border-gray-300 rounded-xl font-sans resize-none focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" rows="3" placeholder={t.additionalInfoPlaceholder} />
           </div>
         </div>
       </Modal>
@@ -811,10 +1228,9 @@ function Haydovchilar() {
       {showNotification && (
         <div className="fixed top-6 right-6 p-4 rounded-xl shadow-lg z-50 flex items-center gap-3 bg-green-500 text-white animate-slide-in">
           <FaCheckCircle />
-          <span>Yangi haydovchi qo'shildi!</span>
+          <span>{t.driverAdded}</span>
         </div>
       )}
-      <Footer />
     </div>
   );
 }

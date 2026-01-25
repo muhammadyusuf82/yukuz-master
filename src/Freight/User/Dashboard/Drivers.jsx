@@ -5,6 +5,65 @@ import {
     FaMapMarkedAlt, FaArrowUp
 } from "react-icons/fa";
 
+const trasnlation = {
+    uz: {
+        teamLoading: "Haydovchilar jamoasi yuklanmoqda",
+        driversTeam: "Haydovchilar jamoasi",
+        all: "Jami",
+        allDrivers: "ta haydovchi",
+        notDriver: "Hozircha haydovchilar yo'q",
+        notDriverYet: "Tizimda ro'yxatdan o'tgan haydovchilar topilmadi.",
+        phone: "Telefon",
+        transport: "Transport",
+        size: "Sig'imi",
+        situation: "Holat",
+        loaded: "Yuklangan",
+        loadSituation: "Faol",
+        income: "Daromad",
+        call: "Qo'ng'iroq",
+        message: "Xabar",
+        load: "Yuk"
+    },
+
+    ru: {
+        teamLoading: "Команда водителей загружается.",
+        driversTeam: "Команда водителей",
+        all: "Общий",
+        allDrivers: "водитель",
+        notDriver: "Водителей пока нет",
+        notDriverYet: "Водителей, зарегистрированных в системе, обнаружено не было.",
+        phone: "Телефон",
+        transport: "Транспорт",
+        size: "Емкость",
+        situation: "Статус",
+        loaded: "Загружено",
+        loadSituation: "Активный",
+        income: "Доход",
+        call: "Вызов",
+        message: "Сообщение",
+        load: "Груз"
+    },
+
+    en: {
+        teamLoading: "Driver team is loading",
+        driversTeam: "Driver team",
+        all: "Total",
+        allDrivers: "driver",
+        notDriver: "No drivers yet",
+        notDriverYet: "No drivers registered in the system were found.",
+        phone: "Phone",
+        transport: "Transport",
+        size: "Size",
+        situation: "Status",
+        loaded: "Loaded",
+        loadSituation: "Active",
+        income: "Income",
+        call: "Call",
+        message: "Message",
+        load: "Load"
+    }
+}
+
 // Reyting komponenti (Haydovchilar.jsx dan olindi)
 function StarRating({ rating }) {
     return (
@@ -20,9 +79,11 @@ function StarRating({ rating }) {
     );
 }
 
-const Drivers = () => {
+const Drivers = ({ currentLang }) => {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const t = trasnlation[currentLang || 'uz']
 
     const getAuthToken = async () => {
         try {
@@ -30,6 +91,7 @@ const Drivers = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    username: "admin",
                     password: "123",
                     phone_number: "+998993967336"
                 }),
@@ -87,8 +149,8 @@ const Drivers = () => {
     if (loading) {
         return (
             <div className="bg-white rounded-4xl p-12 border border-slate-100 shadow-sm flex flex-col items-center justify-center min-h-100">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-slate-500 font-medium animate-pulse">Haydovchilar jamoasi yuklanmoqda...</p>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-600 mb-4"></div>
+                <p className="text-slate-500 font-medium animate-pulse">{t.teamLoading}...</p>
             </div>
         );
     }
@@ -97,9 +159,9 @@ const Drivers = () => {
         <div className="bg-transparent space-y-8">
             <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
                 <div className="flex justify-between items-center mb-10">
-                    <h2 className="text-2xl font-bold text-slate-800">Haydovchilar jamoasi</h2>
+                    <h2 className="text-2xl font-bold text-slate-800">{t.driversTeam}</h2>
                     <span className="bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-sm font-bold">
-                        Jami: {drivers.length} ta haydovchi
+                        {t.all}: {drivers.length} {t.allDrivers}
                     </span>
                 </div>
 
@@ -108,8 +170,8 @@ const Drivers = () => {
                         <div className="bg-slate-50 p-6 rounded-3xl mb-4">
                             <FaInbox className="text-5xl text-slate-300" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-700">Hozircha haydovchilar yo'q</h3>
-                        <p className="text-slate-400 text-center px-6">Tizimda ro'yxatdan o'tgan haydovchilar topilmadi.</p>
+                        <h3 className="text-xl font-bold text-slate-700">{t.notDriver}</h3>
+                        <p className="text-slate-400 text-center px-6">{t.notDriverYet}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -144,19 +206,19 @@ const Drivers = () => {
                                 <div className="p-5 border-b border-gray-50">
                                     <div className="grid grid-cols-2 gap-y-4 gap-x-2">
                                         <div>
-                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Telefon</div>
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">{t.phone}</div>
                                             <div className="font-bold text-gray-800 text-sm font-mono">+998992221133</div>
                                         </div>
                                         <div>
-                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Transport</div>
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">{t.transport}</div>
                                             <div className="font-bold text-gray-800 text-sm capitalize">{driver.vehicle_category || 'Yuk mashinasi'}</div>
                                         </div>
                                         <div>
-                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Sig'imi</div>
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">{t.size}</div>
                                             <div className="font-bold text-gray-800 text-sm">{driver.available_tonnage || '0'} tonna</div>
                                         </div>
                                         <div>
-                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">Holat</div>
+                                            <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-0.5">{t.situation}</div>
                                             <div className="flex items-center gap-1.5">
                                                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
                                                 <span className="font-bold text-gray-800 text-sm">Bo'sh</span>
@@ -180,28 +242,28 @@ const Drivers = () => {
                                 <div className="px-5 py-3 grid grid-cols-3 gap-2 text-center bg-slate-50/50 border-b border-gray-50">
                                     <div>
                                         <div className="text-sm font-black text-blue-600">89</div>
-                                        <div className="text-[9px] text-gray-400 uppercase font-bold">Yakunlangan</div>
+                                        <div className="text-[9px] text-gray-400 uppercase font-bold">{t.loaded}</div>
                                     </div>
                                     <div>
                                         <div className="text-sm font-black text-blue-600">1</div>
-                                        <div className="text-[9px] text-gray-400 uppercase font-bold">Faol</div>
+                                        <div className="text-[9px] text-gray-400 uppercase font-bold">{t.loadSituation}</div>
                                     </div>
                                     <div>
                                         <div className="text-sm font-black text-blue-600">12.5M</div>
-                                        <div className="text-[9px] text-gray-400 uppercase font-bold">Daromad</div>
+                                        <div className="text-[9px] text-gray-400 uppercase font-bold">{t.income}</div>
                                     </div>
                                 </div>
 
                                 {/* Harakatlar tugmalari */}
                                 <div className="p-4 flex gap-2">
                                     <a href={`tel:${driver.phone_number || '+998992221133'}`} className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold text-[11px] hover:text-white hover:border-green-500 hover:bg-green-500 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
-                                        <FaPhone className="w-3 h-3" />Qo'ng'iroq
+                                        <FaPhone className="w-3 h-3" /> {t.call}
                                     </a>
                                     <button className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold text-[11px] hover:text-white hover:border-blue-500 hover:bg-blue-500 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
-                                        <FaComment className="w-3 h-3" />Xabar
+                                        <FaComment className="w-3 h-3" /> {t.message}
                                     </button>
                                     <button className="flex-1 py-2.5 border border-gray-200 rounded-xl font-bold text-[11px] hover:text-white hover:border-purple-600 hover:bg-purple-600 transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
-                                        <FaTruckLoading className="w-3.5 h-3.5" />Yuk
+                                        <FaTruckLoading className="w-3.5 h-3.5" /> {t.load}
                                     </button>
                                 </div>
                             </div>

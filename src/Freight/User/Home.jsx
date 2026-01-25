@@ -13,6 +13,7 @@ import Statistics from './Dashboard/Statistics'
 import Settings from './Dashboard/Settings'
 import Help from './Dashboard/Help'
 import FreightDetail from './Dashboard/FreightDetail'
+import { label } from 'framer-motion/client'
 
 const Home = () => {
   // 1-MUAMMO YECHIMI: Avtomatik 'Home' kaliti bilan boshlanadi
@@ -99,7 +100,7 @@ const Home = () => {
 
   return (
     <div className='bg-[#f8f9fe] min-h-screen'>
-      <Navbar currentLang={lang} onLangChange={setLang} />
+      {/* <Navbar currentLang={lang} onLangChange={setLang} /> */}
       <div className="mx-auto px-3 sm:px-6 py-4 lg:py-10 flex flex-col lg:flex-row gap-8">
         <div className="lg:w-72 shrink-0">
           <Sidebar onPageChange={handlePageChange} activePage={activePage} currentLang={lang} />
@@ -119,7 +120,7 @@ const Home = () => {
           </AnimatePresence>
         </div>
       </div>
-      <Footer currentLang={lang} />
+      {/* <Footer currentLang={lang} /> */}
     </div>
   )
 }

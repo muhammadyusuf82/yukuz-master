@@ -7,7 +7,188 @@ import { FaSyncAlt, FaLayerGroup, FaBox, FaTruck, FaWarehouse, FaEye, FaFilter, 
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import Footer from './Footer/Footer';
 
-function Map() {
+// Translation object
+const translations = {
+  uz: {
+    title: "Real-vaqt Xaritasi",
+    subtitle: "Barcha yuklarni va haydovchilarni real vaqtda kuzating",
+    settings: "Xarita Sozlamalari",
+    reset: "Reset",
+    layers: "Qatlamlar",
+    cargo: "Yuklar",
+    drivers: "Haydovchilar",
+    warehouses: "Omborlar",
+    view: "Ko'rinish",
+    traffic: "Traffic",
+    routes: "Marshrutlar",
+    realtime: "Real-vaqt kuzatish",
+    filters: "Filtrlar",
+    all: "Barchasi",
+    active: "Faol",
+    pending: "Kutilmoqda",
+    delivered: "Yetkazildi",
+    location: "Joylashuv",
+    gettingLocation: "Joylashuv olinmoqda...",
+    showMyLocation: "Mening joylashuvimni ko'rsatish",
+    update: "Yangilash",
+    clear: "Tozalash",
+    locationSuccess: "Joylashuv muvaffaqiyatli olingan! Xaritada qizil marker bilan ko'rsatilgan.",
+    latitude: "Kenglik",
+    longitude: "Uzunlik",
+    searchCargo: "Yukni izlash",
+    share: "Ulashish",
+    realtimeStats: "Real-vaqt Statistikasi",
+    live: "Jonli",
+    activeCargos: "Faol yuklar",
+    onlineDrivers: "Onlayn Haydovchilar",
+    totalDistance: "Jami masofa",
+    averageTime: "O'rtacha vaqt",
+    cargoTracking: "Yuk kuzatish",
+    streetView: "Street View",
+    satelliteView: "Satellite View",
+    detailedStreet: "Detailed Street Map",
+    satellite: "Satellite View",
+    locationHint: "Click location button to see your position on map",
+    locationMarked: "Your location is marked with red marker",
+    zoom: "Zoom",
+    labels: "Labels",
+    labelsOn: "ON",
+    labelsOff: "OFF",
+    coordinateLimit: "Coordinate limit",
+    maxDigits: "Maximum 9 digits",
+    valid: "9 or less: ✅",
+    truncated: "More than 9: truncated",
+    yourLocation: "Your current location",
+    redMarker: "Red marker shows your current location",
+    blueBorder: "Blue border shows Uzbekistan",
+    coordinateWarning: "Coordinates truncated to 9 digits maximum",
+    locationError: "Joylashuv ma'lumotlari olinmadi. Iltimos, brauzer sozlamalarini tekshiring.",
+    locationDenied: "Joylashuv ruxsati rad etildi. Iltimos, brauzer sozlamalarida joylashuv xizmatlarini yoqing.",
+    locationUnavailable: "Joylashuv ma'lumotlari mavjud emas. GPS/WiFi yoqilganligini tekshiring.",
+    locationTimeout: "Joylashuv so'rovi vaqt tugadi. Iltimos, qayta urinib ko'ring.",
+    unknownError: "Noma'lum xatolik yuz berdi."
+  },
+  ru: {
+    title: "Карта в реальном времени",
+    subtitle: "Отслеживайте все грузы и водителей в реальном времени",
+    settings: "Настройки карты",
+    reset: "Сброс",
+    layers: "Слои",
+    cargo: "Грузы",
+    drivers: "Водители",
+    warehouses: "Склады",
+    view: "Вид",
+    traffic: "Трафик",
+    routes: "Маршруты",
+    realtime: "Отслеживание в реальном времени",
+    filters: "Фильтры",
+    all: "Все",
+    active: "Активные",
+    pending: "Ожидающие",
+    delivered: "Доставленные",
+    location: "Местоположение",
+    gettingLocation: "Получение местоположения...",
+    showMyLocation: "Показать мое местоположение",
+    update: "Обновить",
+    clear: "Очистить",
+    locationSuccess: "Местоположение успешно получено! Показано красным маркером на карте.",
+    latitude: "Широта",
+    longitude: "Долгота",
+    searchCargo: "Найти груз",
+    share: "Поделиться",
+    realtimeStats: "Статистика в реальном времени",
+    live: "Живой",
+    activeCargos: "Активные грузы",
+    onlineDrivers: "Онлайн водители",
+    totalDistance: "Общее расстояние",
+    averageTime: "Среднее время",
+    cargoTracking: "Отслеживание груза",
+    streetView: "Вид улиц",
+    satelliteView: "Вид со спутника",
+    detailedStreet: "Детальная карта улиц",
+    satellite: "Вид со спутника",
+    locationHint: "Нажмите кнопку местоположения, чтобы увидеть свою позицию на карте",
+    locationMarked: "Ваше местоположение отмечено красным маркером",
+    zoom: "Масштаб",
+    labels: "Метки",
+    labelsOn: "ВКЛ",
+    labelsOff: "ВЫКЛ",
+    coordinateLimit: "Лимит координат",
+    maxDigits: "Максимум 9 цифр",
+    valid: "9 или меньше: ✅",
+    truncated: "Больше 9: обрезано",
+    yourLocation: "Ваше текущее местоположение",
+    redMarker: "Красный маркер показывает ваше текущее местоположение",
+    blueBorder: "Синяя граница показывает Узбекистан",
+    coordinateWarning: "Координаты обрезаны до максимум 9 цифр",
+    locationError: "Не удалось получить данные о местоположении. Пожалуйста, проверьте настройки браузера.",
+    locationDenied: "Разрешение на доступ к местоположению отклонено. Пожалуйста, включите службы определения местоположения в настройках браузера.",
+    locationUnavailable: "Информация о местоположении недоступна. Проверьте, включен ли GPS/WiFi.",
+    locationTimeout: "Запрос местоположения истек. Пожалуйста, попробуйте еще раз.",
+    unknownError: "Произошла неизвестная ошибка."
+  },
+  en: {
+    title: "Real-time Map",
+    subtitle: "Track all cargo and drivers in real time",
+    settings: "Map Settings",
+    reset: "Reset",
+    layers: "Layers",
+    cargo: "Cargo",
+    drivers: "Drivers",
+    warehouses: "Warehouses",
+    view: "View",
+    traffic: "Traffic",
+    routes: "Routes",
+    realtime: "Real-time Tracking",
+    filters: "Filters",
+    all: "All",
+    active: "Active",
+    pending: "Pending",
+    delivered: "Delivered",
+    location: "Location",
+    gettingLocation: "Getting location...",
+    showMyLocation: "Show my location",
+    update: "Update",
+    clear: "Clear",
+    locationSuccess: "Location successfully obtained! Shown with red marker on the map.",
+    latitude: "Latitude",
+    longitude: "Longitude",
+    searchCargo: "Search cargo",
+    share: "Share",
+    realtimeStats: "Real-time Statistics",
+    live: "Live",
+    activeCargos: "Active cargo",
+    onlineDrivers: "Online Drivers",
+    totalDistance: "Total distance",
+    averageTime: "Average time",
+    cargoTracking: "Cargo Tracking",
+    streetView: "Street View",
+    satelliteView: "Satellite View",
+    detailedStreet: "Detailed Street Map",
+    satellite: "Satellite View",
+    locationHint: "Click location button to see your position on map",
+    locationMarked: "Your location is marked with red marker",
+    zoom: "Zoom",
+    labels: "Labels",
+    labelsOn: "ON",
+    labelsOff: "OFF",
+    coordinateLimit: "Coordinate limit",
+    maxDigits: "Maximum 9 digits",
+    valid: "9 or less: ✅",
+    truncated: "More than 9: truncated",
+    yourLocation: "Your current location",
+    redMarker: "Red marker shows your current location",
+    blueBorder: "Blue border shows Uzbekistan",
+    coordinateWarning: "Coordinates truncated to 9 digits maximum",
+    locationError: "Unable to get location data. Please check your browser settings.",
+    locationDenied: "Location permission denied. Please enable location services in your browser settings.",
+    locationUnavailable: "Location information is unavailable. Check if GPS/WiFi is enabled.",
+    locationTimeout: "Location request timed out. Please try again.",
+    unknownError: "An unknown error occurred."
+  }
+};
+
+function Map({ currentLang }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const marker = useRef(null);
@@ -16,7 +197,11 @@ function Map() {
   const [zoomLevel, setZoomLevel] = useState(5);
   const [lng, setLng] = useState(0.0);
   const [lat, setLat] = useState(0.0);
-  
+  const [language, setLanguage] = useState('uz'); // Default language
+
+  // Get translation function
+  const t = translations[currentLang || 'uz']
+
   // State for user's current position
   const [userPosition, setUserPosition] = useState(null);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -27,26 +212,26 @@ function Map() {
   // Helper function to format coordinates to max 9 digits (same as working example)
   const formatCoordinate = (coord) => {
     if (!coord && coord !== 0) return '';
-    
+
     const str = coord.toString();
     const trimmed = str.trim();
-    
+
     if (trimmed.length <= 9) {
       return trimmed;
     }
-    
+
     if (trimmed.includes('.')) {
       const [integerPart, decimalPart] = trimmed.split('.');
       const integerLength = integerPart.length;
       const availableDecimalDigits = 9 - integerLength - 1;
-      
+
       if (availableDecimalDigits > 0) {
         return `${integerPart}.${decimalPart.substring(0, availableDecimalDigits)}`;
       } else {
         return integerPart;
       }
     }
-    
+
     return trimmed.substring(0, 9);
   };
 
@@ -54,14 +239,14 @@ function Map() {
   const getUserLocation = useCallback(() => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by your browser'));
+        reject(new Error(t.locationError));
         return;
       }
 
       setLocationLoading(true);
       setLocationError(null);
       setCoordinateWarning('');
-      
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy } = position.coords;
@@ -71,28 +256,28 @@ function Map() {
             accuracy: `${accuracy} meters`,
             source: 'GPS/WiFi/Cell'
           });
-          
+
           const location = {
             lat: formatCoordinate(latitude),
             lon: formatCoordinate(longitude)
           };
-          
+
           // Save to localStorage
           localStorage.setItem('userLocation', JSON.stringify(location));
-          
+
           // Set the position with parsed float values for the marker
           const parsedPosition = [parseFloat(location.lon), parseFloat(location.lat)];
           setUserPosition(parsedPosition);
           setLocationLoading(false);
-          
+
           // Check if coordinates were truncated
           const originalLngStr = longitude.toString();
           const originalLatStr = latitude.toString();
-          
+
           if (originalLngStr.length > 9 || originalLatStr.length > 9) {
-            setCoordinateWarning('Coordinates truncated to 9 digits maximum');
+            setCoordinateWarning(t.coordinateWarning);
           }
-          
+
           // Update map center
           if (map.current) {
             map.current.flyTo({
@@ -101,26 +286,26 @@ function Map() {
               duration: 2000
             });
           }
-          
+
           // Update marker
           updateMarker(parseFloat(location.lon), parseFloat(location.lat));
-          
+
           resolve(location);
         },
         (error) => {
-          let errorMessage = 'Unable to retrieve your location';
+          let errorMessage = t.locationError;
           switch (error.code) {
             case error.PERMISSION_DENIED:
-              errorMessage = 'Location permission denied. Please enable location services in your browser settings.';
+              errorMessage = t.locationDenied;
               break;
             case error.POSITION_UNAVAILABLE:
-              errorMessage = 'Location information is unavailable. Check if GPS/WiFi is enabled.';
+              errorMessage = t.locationUnavailable;
               break;
             case error.TIMEOUT:
-              errorMessage = 'Location request timed out. Please try again.';
+              errorMessage = t.locationTimeout;
               break;
             default:
-              errorMessage = 'An unknown error occurred.';
+              errorMessage = t.unknownError;
           }
           console.error('Geolocation error:', error);
           setLocationError(errorMessage);
@@ -134,24 +319,24 @@ function Map() {
         }
       );
     });
-  }, []);
+  }, [t]);
 
   // Update marker position (from working example)
   const updateMarker = useCallback((lng, lat) => {
     if (!map.current) return;
-    
+
     // Format coordinates
     const formattedLng = formatCoordinate(lng);
     const formattedLat = formatCoordinate(lat);
-    
+
     // Check if coordinates were truncated
     const originalLngStr = lng.toString();
     const originalLatStr = lat.toString();
-    
+
     if (originalLngStr.length > 9 || originalLatStr.length > 9) {
-      setCoordinateWarning('Coordinates truncated to 9 digits maximum');
+      setCoordinateWarning(t.coordinateWarning);
     }
-    
+
     // Remove existing marker
     if (marker.current) {
       marker.current.remove();
@@ -189,28 +374,28 @@ function Map() {
       closeOnClick: false
     }).setHTML(`
       <div style="padding: 8px;">
-        <h3 style="margin: 0; font-weight: bold; font-size: 14px; color: #FF0000;">📍 Your Current Location</h3>
+        <h3 style="margin: 0; font-weight: bold; font-size: 14px; color: #FF0000;">📍 ${t.yourLocation}</h3>
         <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">
-          Latitude: ${formattedLat}<br/>
-          Longitude: ${formattedLng}
+          ${t.latitude}: ${formattedLat}<br/>
+          ${t.longitude}: ${formattedLng}
         </p>
       </div>
     `);
-    
+
     marker.current.setPopup(popup);
 
     // Show popup on hover
     el.addEventListener('mouseenter', () => {
       marker.current.togglePopup();
     });
-    
+
     el.addEventListener('mouseleave', () => {
       marker.current.togglePopup();
     });
 
     // Update state with formatted coordinates
     setUserPosition([markerLng, markerLat]);
-  }, []);
+  }, [t]);
 
   // Function to center on user's location
   const centerOnUserLocation = async () => {
@@ -234,7 +419,7 @@ function Map() {
       }
     } catch (error) {
       console.error('Error centering on user location:', error);
-      alert(locationError || 'Unable to get your location. Please check your browser permissions.');
+      alert(locationError || t.locationError);
     }
   };
 
@@ -307,7 +492,7 @@ function Map() {
 
   const addBorderLayers = useCallback(() => {
     if (!map.current) return;
-    
+
     if (map.current.getSource('uzbekistan-border')) {
       map.current.removeLayer('uzbekistan-fill');
       map.current.removeLayer('uzbekistan-border-line');
@@ -346,7 +531,7 @@ function Map() {
     if (!mapContainer.current || map.current) return;
 
     console.log('Initializing map...');
-    
+
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: {
@@ -401,10 +586,10 @@ function Map() {
     map.current.on('load', () => {
       console.log('Map loaded');
       setMapLoaded(true);
-      
+
       // Add Uzbekistan border
       addBorderLayers();
-      
+
       // Load user location from localStorage
       const savedLocation = localStorage.getItem('userLocation');
       if (savedLocation) {
@@ -440,7 +625,7 @@ function Map() {
   const toggleMapStyle = () => {
     const newShowSatellite = !showSatellite;
     setShowSatellite(newShowSatellite);
-    
+
     if (map.current) {
       const newStyle = newShowSatellite
         ? {
@@ -482,7 +667,7 @@ function Map() {
 
       map.current.once('styledata', () => {
         addBorderLayers();
-        
+
         if (marker.current && userPosition) {
           updateMarker(userPosition[0], userPosition[1]);
         }
@@ -496,23 +681,23 @@ function Map() {
       marker.current.remove();
       marker.current = null;
     }
-    
+
     setUserPosition(null);
     setCoordinateWarning('');
     localStorage.removeItem('userLocation');
   };
 
   const layers = [
-    { id: 1, icon: FaBox, title: "Yuklar", num: 12, bg: "bg-blue-500" },
-    { id: 2, icon: FaTruck, title: "Haydovchilar", num: 24, bg: "bg-blue-500" },
-    { id: 3, icon: FaWarehouse, title: "Omborlar", num: 8, bg: "bg-[#e9ecef]" },
+    { id: 1, icon: FaBox, title: t.cargo, num: 12, bg: "bg-blue-500" },
+    { id: 2, icon: FaTruck, title: t.drivers, num: 24, bg: "bg-blue-500" },
+    { id: 3, icon: FaWarehouse, title: t.warehouses, num: 8, bg: "bg-[#e9ecef]" },
   ]
 
-  const [settings, setSettings] = useState([
-    { id: 1, title: "Traffic", active: false },
-    { id: 2, title: "Marshrutlar", active: true },
-    { id: 3, title: "Real-vaqt kuzatish", active: true }
-  ]);
+  const settings = [
+    { id: 1, title: t.traffic, active: false },
+    { id: 2, title: t.routes, active: true },
+    { id: 3, title: t.realtime, active: true }
+  ];
 
   const toggleSwitch = (id) => {
     setSettings(prevSettings =>
@@ -523,43 +708,57 @@ function Map() {
   };
 
   const filters = [
-    { id: 1, title: "Barchasi", active: true },
-    { id: 2, title: "Faol", active: false },
-    { id: 3, title: "Kutilmoqda", active: false },
-    { id: 4, title: "Yetkazildi", active: false },
+    { id: 1, title: t.all, active: true },
+    { id: 2, title: t.active, active: false },
+    { id: 3, title: t.pending, active: false },
+    { id: 4, title: t.delivered, active: false },
   ]
 
   const statistics = [
-    { id: 1, icon: FaTruck, num: 15, title: "Faol yuklar" },
-    { id: 2, icon: FaUsers, num: 24, title: "Onlayn Haydovchilar" },
-    { id: 3, icon: FaRoad, num: "1,248 km", title: "Jami masofa" },
-    { id: 4, icon: FaClock, num: "4.2 soat", title: "O'rtacha vaqt" },
+    { id: 1, icon: FaTruck, num: 15, title: t.activeCargos },
+    { id: 2, icon: FaUsers, num: 24, title: t.onlineDrivers },
+    { id: 3, icon: FaRoad, num: "1,248 km", title: t.totalDistance },
+    { id: 4, icon: FaClock, num: "4.2 soat", title: t.averageTime },
   ]
 
+  // Add language switcher to Navbar
+  const handleLanguageChange = (lang) => {
+    setLanguage(lang);
+    // You could save language preference to localStorage
+    localStorage.setItem('preferredLanguage', lang);
+  };
+
+  // Load saved language preference on component mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    if (savedLanguage && translations[savedLanguage]) {
+      setLanguage(savedLanguage);
+    }
+  }, []);
+
   return (<>
-    <Navbar />
     <div className='bg-[#f8f8fd] py-3 sm:py-6 md:py-9 lg:py-12 px-2 sm:px-4 md:px-6 xl:px-8'>
-      <h1 className='text-xl sm:text-2xl lg:text-3xl xl:text-5xl font-semibold text-center md:text-start'>Real-vaqt Xaritasi</h1>
-      <p className='text-sm sm:text-base md:text-lg lg:text-xl text-[#495057] text-center md:text-start mt-4'>Barcha yuklarni va haydovchilarni real vaqtda kuzating</p>
+      <h1 className='text-xl sm:text-2xl lg:text-3xl xl:text-5xl font-semibold text-center md:text-start'>{t.title}</h1>
+      <p className='text-sm sm:text-base md:text-lg lg:text-xl text-[#495057] text-center md:text-start mt-4'>{t.subtitle}</p>
 
       <div className="flex gap-3 sm:gap-5 md:gap-7 lg:gap-9 flex-col md:flex-row py-5 sm:py-7 md:py-9">
         <div className="w-full md:w-1/3 lg:w-2/6 flex gap-3 sm:gap-5 lg:gap-7 flex-col">
           <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8">
             <div className="flex items-center justify-between">
-              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>Xarita Sozlamalari</h3>
-              <button 
+              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>{t.settings}</h3>
+              <button
                 onClick={resetView}
                 className='border border-blue-500 rounded-lg flex gap-2.5 items-center text-xs md:text-sm text-blue-500 font-medium hover:bg-blue-500 hover:text-white py-1.5 px-4 duration-300 cursor-pointer'
               >
                 <FaSyncAlt />
-                Reset
+                {t.reset}
               </button>
             </div>
 
             <div className="mt-3 md:mt-5">
               <p className='flex gap-2.5 items-center text-xs sm:text-sm md:text-base font-medium'>
                 <FaLayerGroup className='text-blue-500' />
-                Qatlamlar
+                {t.layers}
               </p>
 
               <ul className='list-none flex gap-1 flex-wrap py-3'>
@@ -578,7 +777,7 @@ function Map() {
             <div className="mt-1 md:mt-2.5">
               <p className='flex gap-2.5 items-center text-xs sm:text-sm md:text-base font-medium mb-1'>
                 <FaEye className='text-blue-500' />
-                Ko'rinish
+                {t.view}
               </p>
 
               <div>
@@ -602,7 +801,7 @@ function Map() {
             <div className="mt-2 md:mt-6">
               <p className='flex gap-2.5 items-center text-xs sm:text-sm md:text-base font-medium mb-1'>
                 <FaFilter className='text-blue-500' />
-                Filtrlar
+                {t.filters}
               </p>
 
               <ul className='list-none flex gap-2 flex-wrap'>
@@ -618,9 +817,9 @@ function Map() {
             <div className="mt-6 border-t pt-4">
               <p className='flex gap-2.5 items-center text-xs sm:text-sm md:text-base font-medium mb-3'>
                 <FaLocationCrosshairs className='text-blue-500' />
-                Joylashuv
+                {t.location}
               </p>
-              
+
               {coordinateWarning && (
                 <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-xs text-yellow-600 flex items-center gap-1">
@@ -628,9 +827,9 @@ function Map() {
                   </p>
                 </div>
               )}
-              
+
               <div className="flex flex-col gap-2">
-                <button 
+                <button
                   onClick={centerOnUserLocation}
                   disabled={locationLoading}
                   className='w-full flex gap-2 items-center justify-center bg-blue-500 border border-blue-500 text-sm text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 duration-300 cursor-pointer'
@@ -638,48 +837,48 @@ function Map() {
                   {locationLoading ? (
                     <>
                       <FaSyncAlt className="animate-spin" />
-                      Joylashuv olinmoqda...
+                      {t.gettingLocation}
                     </>
                   ) : (
                     <>
                       <FaLocationCrosshairs />
-                      Mening joylashuvimni ko'rsatish
+                      {t.showMyLocation}
                     </>
                   )}
                 </button>
-                
+
                 <div className="grid grid-cols-2 gap-2">
-                  <button 
+                  <button
                     onClick={updateLocationManually}
                     className='w-full flex gap-2 items-center justify-center bg-white border border-blue-500 text-sm text-blue-500 font-medium py-2 px-4 rounded-lg hover:bg-blue-50 duration-300 cursor-pointer'
                   >
                     <FaSyncAlt />
-                    Yangilash
+                    {t.update}
                   </button>
-                  
-                  <button 
+
+                  <button
                     onClick={handleClearLocation}
                     className='w-full flex gap-2 items-center justify-center bg-red-100 border border-red-200 text-sm text-red-600 font-medium py-2 px-4 rounded-lg hover:bg-red-200 duration-300 cursor-pointer'
                   >
                     <FaSyncAlt />
-                    Tozalash
+                    {t.clear}
                   </button>
                 </div>
-                
+
                 {locationError && (
                   <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-xs text-red-600">{locationError}</p>
                   </div>
                 )}
-                
+
                 {userPosition && !locationError && (
                   <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg">
                     <p className="text-xs text-green-600">
-                      Joylashuv muvaffaqiyatli olingan! Xaritada qizil marker bilan ko'rsatilgan.
+                      {t.locationSuccess}
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
-                      Kenglik: {userPosition[1]?.toFixed(6)}<br/>
-                      Uzunlik: {userPosition[0]?.toFixed(6)}
+                      {t.latitude}: {userPosition[1]?.toFixed(6)}<br />
+                      {t.longitude}: {userPosition[0]?.toFixed(6)}
                     </p>
                   </div>
                 )}
@@ -689,22 +888,22 @@ function Map() {
             <div className="flex gap-3 pt-6">
               <button className='w-3/5 flex gap-2 items-center bg-blue-500 border border-blue-500 text-sm text-white font-medium py-1.5 px-4 rounded-full transform hover:-translate-y-1 hover:shadow-lg duration-300 cursor-pointer'>
                 <FaSearch />
-                Yukni izlash
+                {t.searchCargo}
               </button>
               <button className='w-3/5 flex gap-2 items-center bg-white border border-blue-500 text-sm text-blue-500 font-medium py-1.5 px-4 rounded-full hover:bg-blue-500 hover:text-white duration-300 cursor-pointer'>
                 <FaShareAlt />
-                Ulashish
+                {t.share}
               </button>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8">
             <div className="flex items-center justify-between">
-              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>Real-vaqt Statistikasi</h3>
+              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>{t.realtimeStats}</h3>
 
               <p className='flex gap-1 items-center text-xs sm:text-sm text-[#4cc9f0]'>
                 <FaCircle className='text-[10px]' />
-                Jonli
+                {t.live}
               </p>
             </div>
 
@@ -725,10 +924,10 @@ function Map() {
 
           <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8">
             <div className="flex items-center justify-between mb-10">
-              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>Yuk kuzatish</h3>
+              <h3 className='text-sm sm:text-base md:text-lg lg:text-xl font-bold'>{t.cargoTracking}</h3>
               <button className='border border-blue-500 rounded-lg flex gap-2.5 items-center text-xs md:text-sm text-blue-500 font-medium hover:bg-blue-500 hover:text-white py-1.5 px-4 duration-300 cursor-pointer'>
                 <FaSyncAlt />
-                Yangilash
+                {t.update}
               </button>
             </div>
           </div>
@@ -737,29 +936,29 @@ function Map() {
         <div className="relative w-full md:w-4/5 lg:w-3/4 bg-[#f8f8fd] h-1/2 rounded-2xl shadow-2xl p-4 sm:p-5 md:p-6 lg:p-7 xl:p-8">
           <div className="lg:w-full">
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
-              <div className="px-6 py-4 bg-gradient-to-r from-blue-800 to-blue-900 text-white">
+              <div className="px-6 py-4 bg-linear-to-r from-blue-800 to-blue-900 text-white">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
                   <div>
                     <h2 className="text-xl font-bold">
-                      {showSatellite ? 'Satellite View' : 'Detailed Street Map'}
+                      {showSatellite ? t.satelliteView : t.detailedStreet}
                     </h2>
                     <p className="text-blue-200 text-sm mt-1">
-                      {userPosition ? 'Your location is marked with red marker' : 'Click location button to see your position on map'}
-                      {locationLoading && ' (Getting location...)'}
+                      {userPosition ? t.locationMarked : t.locationHint}
+                      {locationLoading && ' (' + t.gettingLocation + ')'}
                     </p>
                   </div>
                   <div className="mt-2 sm:mt-0 flex items-center space-x-2">
-                    <button 
+                    <button
                       onClick={toggleMapStyle}
                       className="px-3 py-1 bg-white text-blue-500 rounded-full text-sm font-medium hover:bg-blue-50"
                     >
-                      {showSatellite ? 'Street View' : 'Satellite View'}
+                      {showSatellite ? t.streetView : t.satelliteView}
                     </button>
                     <div className={`px-3 py-1 rounded-full text-sm font-medium ${zoomLevel >= 12 ? 'bg-green-500' : 'bg-gray-600'}`}>
-                      Labels: {zoomLevel >= 12 ? 'ON' : 'OFF'}
+                      {t.labels}: {zoomLevel >= 12 ? t.labelsOn : t.labelsOff}
                     </div>
                     <div className="px-3 py-1 bg-blue-500 rounded-full text-sm font-medium">
-                      Zoom: {zoomLevel.toFixed(1)}x
+                      {t.zoom}: {zoomLevel.toFixed(1)}x
                     </div>
                   </div>
                 </div>
@@ -768,26 +967,26 @@ function Map() {
               <div className="relative">
                 <div
                   ref={mapContainer}
-                  className="w-full h-[600px]"
+                  className="w-full h-150"
                 />
-                
+
                 {/* Map Controls */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  <button 
+                  <button
                     onClick={() => map.current?.zoomIn()}
                     className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100"
                     title="Zoom in"
                   >
                     <FaPlus />
                   </button>
-                  <button 
+                  <button
                     onClick={() => map.current?.zoomOut()}
                     className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100"
                     title="Zoom out"
                   >
                     <FaMinus />
                   </button>
-                  <button 
+                  <button
                     onClick={centerOnUserLocation}
                     disabled={locationLoading}
                     className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
@@ -800,33 +999,33 @@ function Map() {
                     )}
                   </button>
                 </div>
-                
+
                 {/* Coordinate Limit Notice */}
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg max-w-xs">
-                  <p className="text-xs font-medium text-slate-700 mb-1">Coordinate limit:</p>
-                  <p className="text-xs text-slate-600">Maximum 9 digits</p>
+                  <p className="text-xs font-medium text-slate-700 mb-1">{t.coordinateLimit}:</p>
+                  <p className="text-xs text-slate-600">{t.maxDigits}</p>
                   <div className="mt-2 text-xs text-slate-500">
                     <div className="flex items-center gap-1">
                       <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                      <span>9 or less: ✅</span>
+                      <span>{t.valid}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                      <span>More than 9: truncated</span>
+                      <span>{t.truncated}</span>
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Location Status */}
                 {userPosition && (
                   <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg max-w-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium text-blue-700">Your current location</span>
+                      <span className="text-sm font-medium text-blue-700">{t.yourLocation}</span>
                     </div>
                     <p className="text-xs text-gray-600 mt-1">
-                      Lat: {userPosition[1]?.toFixed(6)}<br/>
-                      Lon: {userPosition[0]?.toFixed(6)}
+                      {t.latitude}: {userPosition[1]?.toFixed(6)}<br />
+                      {t.longitude}: {userPosition[0]?.toFixed(6)}
                     </p>
                     <div className="mt-1 text-xs">
                       <span className={`px-2 py-0.5 rounded ${userPosition[1]?.toString().length <= 9 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
@@ -844,11 +1043,11 @@ function Map() {
                 <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <div className="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
-                    Red marker shows your current location
+                    {t.redMarker}
                   </div>
                   <div className="flex items-center">
                     <div className="w-4 h-4 border-2 border-blue-500 mr-2"></div>
-                    Blue border shows Uzbekistan
+                    {t.blueBorder}
                   </div>
                 </div>
               </div>
@@ -857,7 +1056,6 @@ function Map() {
         </div>
       </div>
     </div>
-  <Footer />
   </>)
 }
 

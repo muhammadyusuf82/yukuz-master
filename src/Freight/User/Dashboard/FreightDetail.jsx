@@ -47,6 +47,9 @@ import maplibregl from 'maplibre-gl';
 import { FaMessage } from "react-icons/fa6";
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
+
+
 // Freight Owner Card Component
 const FreightOwnerCard = ({ ownerData, onChatClick, onOfferClick, showActions = true }) => {
   if (!ownerData) return null;
@@ -1309,9 +1312,14 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
   };
 
   // Function to send offer message via WebSocket
-  const sendOfferMessage = () => {
-    const currentUser = JSON.parse(localStorage.getItem('user'));
-    const token = localStorage.getItem('access_token') || localStorage.getItem('token');
+  const sendOfferMessage = async () => {
+    const token = localStorage.getItem('token')
+    const req = await fetch(BASE_HTTP_URL + 'users/', {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    })
+    const currentUser = await req.json();
     
     if (!currentUser || !token) {
       alert('Foydalanuvchi ma\'lumotlari topilmadi');
@@ -1325,7 +1333,7 @@ yetkazish muddati - ${startDate} dan ${endDate} gacha
 qo'shimcha izoh - ${comments || "yo'q"}`;
 
     // Create WebSocket connection
-    const ws = new WebSocket(`wss://tokennoty.pythonanywhere.com/ws/chat/${token}/`);
+    const ws = new WebSocket(`ws://10.59.148.210/ws/chat/${token}/`);
     
     ws.onopen = () => {
       const messageData = {
@@ -1358,7 +1366,7 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
 
     try {
       // First send the message
-      const messageSent = sendOfferMessage();
+      const messageSent = await sendOfferMessage();
       
       if (!messageSent) {
         throw new Error('Xabar yuborishda xatolik');
