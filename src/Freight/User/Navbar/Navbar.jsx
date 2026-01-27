@@ -266,7 +266,7 @@ const Navbar = ({ currentLang, onLangChange }) => {
           boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}
       >
-        <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(66vh - 2rem)' }}>
+        <div className="p-4 overflow-y-auto">
           {/* Mobile menu user info - only show if not on chat page */}
           {token && !isChatPage && (
             <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
