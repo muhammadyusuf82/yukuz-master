@@ -14,12 +14,13 @@ import {
   FaComments,
   FaFilter,
   FaSortAmountDown,
-  FaSortAmountUp
+  FaSortAmountUp,
+  FaArrowLeft
 } from "react-icons/fa"
 import { CiCircleChevLeft } from "react-icons/ci";
 import Chat from './Chat'
 
-const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
+const BASE_HTTP_URL = 'http://127.0.0.1/:8000/api/'
 
 const Messanger = () => {
   const [chats, setChats] = useState([])
@@ -27,18 +28,45 @@ const Messanger = () => {
   const [activeChat, setActiveChat] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterUnread, setFilterUnread] = useState(false)
-  const [sortOrder, setSortOrder] = useState('desc') // 'asc' or 'desc'
+  const [sortOrder, setSortOrder] = useState('desc')
+  const [isMobile, setIsMobile] = useState(false)
+  const [showChatList, setShowChatList] = useState(true)
 
+  // Check for mobile and handle URL parameters
   useEffect(() => {
-    fetchChats()
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 1024
+      setIsMobile(mobile)
+      if (mobile && activeChat) {
+        setShowChatList(false)
+      } else {
+        setShowChatList(true)
+      }
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
     
     // Check URL for chat parameter
     const urlParams = new URLSearchParams(window.location.search)
     const chatParam = urlParams.get('chat')
     if (chatParam) {
       setActiveChat(chatParam)
+      if (window.innerWidth < 1024) {
+        setShowChatList(false)
+      }
     }
+    
+    fetchChats()
+    
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  useEffect(() => {
+    if (!isMobile) {
+      setShowChatList(true)
+    }
+  }, [isMobile])
 
   const fetchChats = async () => {
     try {
@@ -51,9 +79,6 @@ const Messanger = () => {
         setLoading(false)
         return
       }
-
-      // In a real app, you would have an endpoint to fetch all chats
-      // For now, we'll simulate with a sample data and later integrate with API
       
       setTimeout(async () => {
         const res = await (await fetch(BASE_HTTP_URL + 'chats/', {headers: {Authorization: `Token ${token}`}})).json()
@@ -93,6 +118,7 @@ const Messanger = () => {
     })
 
   const formatTime = (dateString) => {
+    if (!dateString) return ''
     const date = new Date(dateString)
     const now = new Date()
     const diffMs = now - date
@@ -111,11 +137,11 @@ const Messanger = () => {
 
   const getUserAvatar = (chat) => {
     const colors = [
-      'bg-linear-to-br from-blue-500 to-cyan-600',
-      'bg-linear-to-br from-purple-500 to-pink-600',
-      'bg-linear-to-br from-green-500 to-emerald-600',
-      'bg-linear-to-br from-yellow-500 to-orange-600',
-      'bg-linear-to-br from-red-500 to-pink-600'
+      'bg-gradient-to-br from-blue-500 to-cyan-600',
+      'bg-gradient-to-br from-purple-500 to-pink-600',
+      'bg-gradient-to-br from-green-500 to-emerald-600',
+      'bg-gradient-to-br from-yellow-500 to-orange-600',
+      'bg-gradient-to-br from-red-500 to-pink-600'
     ]
     const colorIndex = chat.id % colors.length
     return colors[colorIndex]
@@ -125,16 +151,57 @@ const Messanger = () => {
     return `${chat.first_name?.[0] || ''}${chat.last_name?.[0] || ''}`.toUpperCase()
   }
 
+  const handleChatSelect = (username) => {
+    setActiveChat(username)
+    if (isMobile) {
+      setShowChatList(false)
+      // Update URL without page reload
+      window.history.pushState({}, '', `?chat=${username}`)
+    }
+  }
+
+  const handleBackToChats = () => {
+    setShowChatList(true)
+    window.history.pushState({}, '', window.location.pathname)
+  }
+
+  // Listen for back/forward browser buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search)
+      const chatParam = urlParams.get('chat')
+      if (chatParam) {
+        setActiveChat(chatParam)
+        if (isMobile) setShowChatList(false)
+      } else {
+        setActiveChat(null)
+        if (isMobile) setShowChatList(true)
+      }
+    }
+    
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [isMobile])
+
   return (
-    <div className="flex h-screen bg-linear-to-br from-gray-50 to-blue-50">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Left Sidebar - Chats List */}
-      <div className="w-full lg:w-[35%] border-r border-gray-200 bg-white flex flex-col">
+      <div className={`
+        ${isMobile && !showChatList ? 'hidden' : 'flex'} 
+        ${isMobile ? 'w-full absolute inset-0 z-10' : 'w-full lg:w-96 xl:w-80 2xl:w-96'} 
+        flex-col border-r border-gray-200 bg-white
+      `}>
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <button onClick={()=>history.back()} className='p-2 bg-linear-to-r from-blue-100 to-purple-100 rounded-xl'><CiCircleChevLeft className='text-xl text-blue-600'/> </button>
-              <div className="p-2 bg-linear-to-r from-blue-100 to-purple-100 rounded-xl">
+              <button 
+                onClick={()=>history.back()} 
+                className='p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl'
+              >
+                <CiCircleChevLeft className='text-xl text-blue-600'/> 
+              </button>
+              <div className="p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl">
                 <FaComments className="text-blue-600 text-xl" />
               </div>
               <div>
@@ -184,7 +251,7 @@ const Messanger = () => {
             </div>
           ) : filteredAndSortedChats.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
-              <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-4">
                 <FaEnvelope className="text-blue-400 text-2xl" />
               </div>
               <p className="text-lg font-medium">Chatlar topilmadi</p>
@@ -206,7 +273,7 @@ const Messanger = () => {
             filteredAndSortedChats.map((chat) => (
               <div
                 key={chat.id}
-                onClick={() => setActiveChat(chat.username)}
+                onClick={() => handleChatSelect(chat.username)}
                 className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
                   activeChat === chat.username ? 'bg-blue-50 border-r-4 border-r-blue-500' : ''
                 }`}
@@ -281,12 +348,40 @@ const Messanger = () => {
       </div>
 
       {/* Right Side - Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className={`
+        ${isMobile && showChatList ? 'hidden' : 'flex'}
+        flex-1 flex-col relative
+      `}>
         {activeChat ? (
-          <Chat username={activeChat} />
+          <>
+            {/* Mobile Chat Header with Back Button */}
+            {isMobile && (
+              <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleBackToChats}
+                    className="p-2 rounded-full hover:bg-gray-100"
+                  >
+                    <FaArrowLeft className="text-gray-600" />
+                  </button>
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <FaUser className="text-white text-sm" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-gray-800 truncate max-w-[200px]">{activeChat}</h2>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-xs text-gray-500">Online</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <Chat username={activeChat} isMobile={isMobile} onBack={handleBackToChats} />
+          </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-gray-500">
-            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-6">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center mb-6">
               <FaComments className="text-blue-400 text-4xl" />
             </div>
             <h2 className="text-2xl font-bold text-gray-700 mb-2">Suhbatni boshlang</h2>

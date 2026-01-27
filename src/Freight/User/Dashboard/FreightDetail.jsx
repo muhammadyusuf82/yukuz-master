@@ -47,7 +47,7 @@ import maplibregl from 'maplibre-gl';
 import { FaMessage } from "react-icons/fa6";
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
+const BASE_HTTP_URL = 'http://127.0.0.1/:8000/api/'
 
 
 // Freight Owner Card Component
@@ -1333,7 +1333,7 @@ yetkazish muddati - ${startDate} dan ${endDate} gacha
 qo'shimcha izoh - ${comments || "yo'q"}`;
 
     // Create WebSocket connection
-    const ws = new WebSocket(`ws://10.59.148.210/ws/chat/${token}/`);
+    const ws = new WebSocket(`ws://127.0.0.1/:8000/ws/chat/${token}/`);
     
     ws.onopen = () => {
       const messageData = {

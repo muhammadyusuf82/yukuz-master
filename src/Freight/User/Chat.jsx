@@ -1,20 +1,19 @@
 import { useEffect, useState, useRef } from "react"
-import { FaPaperPlane, FaUserCircle, FaUser, FaClock, FaCheck, FaCheckDouble } from "react-icons/fa"
+import { FaPaperPlane, FaUserCircle, FaUser, FaClock, FaCheck, FaCheckDouble, FaArrowLeft } from "react-icons/fa"
 
-const BASE_WEBSOCKET_URL = 'ws://10.59.148.210:8000/ws/'
-const BASE_HTTP_URL = 'http://10.59.148.210:8000/api/'
+const BASE_WEBSOCKET_URL = 'ws://127.0.0.1/:8000/ws/'
+const BASE_HTTP_URL = 'http://127.0.0.1/:8000/api/'
 
-const Chat = ({ username }) => {
+const Chat = ({ username, isMobile, onBack }) => {
     const [messages, setMessages] = useState([])
     const [inputText, setInputText] = useState('')
     const [chatSocket, setChatSocket] = useState(null)
     const [isConnected, setIsConnected] = useState(false)
     const messagesEndRef = useRef(null)
-
-    // for change
+    const inputRef = useRef(null)
 
     useEffect(() => {
-        const token = localStorage.getItem('token') || localStorage.getItem('access_token')
+        const token = localStorage.getItem('token')
         if (!token || !username) return
 
         const socket = new WebSocket(BASE_WEBSOCKET_URL + `chat/${token}/`)
@@ -67,7 +66,7 @@ const Chat = ({ username }) => {
                         sent_at: new Date(e.sent_at),
                         is_you: e.sender_username === user?.username
                     }))
-                    setMessages(formattedMessages.reverse()) // Reverse to show latest at bottom
+                    setMessages(formattedMessages.reverse())
                 }
             } catch (error) {
                 console.error('Error fetching messages:', error)
@@ -76,10 +75,17 @@ const Chat = ({ username }) => {
 
         fetchMessages()
 
+        // Focus input on mobile
+        if (isMobile) {
+            setTimeout(() => {
+                inputRef.current?.focus()
+            }, 300)
+        }
+
         return () => {
             socket.close()
         }
-    }, [username])
+    }, [username, isMobile])
 
     // Scroll to bottom when new messages arrive
     useEffect(() => {
@@ -113,6 +119,13 @@ const Chat = ({ username }) => {
         }])
         
         setInputText('')
+        
+        // Keep focus on input after sending
+        if (isMobile) {
+            setTimeout(() => {
+                inputRef.current?.focus()
+            }, 100)
+        }
     }
 
     const handleKeyPress = (e) => {
@@ -123,14 +136,13 @@ const Chat = ({ username }) => {
     }
 
     const formatTime = (date) => {
+        if (!date) return ''
         const now = new Date()
         const messageDate = new Date(date)
         
         if (now.toDateString() === messageDate.toDateString()) {
-            // Today
             return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         } else {
-            // Another day
             return messageDate.toLocaleDateString([], { month: 'short', day: 'numeric' }) + 
                    ' ' + messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
@@ -138,30 +150,32 @@ const Chat = ({ username }) => {
 
     return (
         <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-blue-50">
-            {/* Chat Header */}
-            <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className="relative">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <FaUser className="text-white" />
+            {/* Desktop Chat Header */}
+            {!isMobile && (
+                <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="relative">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <FaUser className="text-white" />
+                                </div>
+                                {isConnected && (
+                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                                )}
                             </div>
-                            {isConnected && (
-                                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                            )}
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-gray-800">{username}</h2>
-                            <div className="flex items-center space-x-2">
-                                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                                <span className="text-xs text-gray-500">
-                                    {isConnected ? 'Online' : 'Offline'}
-                                </span>
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-800">{username}</h2>
+                                <div className="flex items-center space-x-2">
+                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                    <span className="text-xs text-gray-500">
+                                        {isConnected ? 'Online' : 'Offline'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -224,6 +238,7 @@ const Chat = ({ username }) => {
                 <div className="flex items-center space-x-3">
                     <div className="flex-1">
                         <input
+                            ref={inputRef}
                             type="text"
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}

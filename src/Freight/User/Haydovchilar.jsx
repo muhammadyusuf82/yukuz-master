@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Navbar from './Navbar/Navbar';
 import Footer from './Footer/Footer';
 import {
@@ -32,58 +32,47 @@ import {
   FaBoxOpen,
   FaGlobe,
   FaRulerHorizontal,
-  FaRulerVertical
+  FaRulerVertical,
+  FaCircle,
+  FaLocationArrow,
+  FaPlug,
+  FaMapPin
 } from 'react-icons/fa';
 
 // Tarjimalar obyekti
 const translations = {
   uz: {
-    // Sahifa sarlavhalari
     pageTitle: "Haydovchilar",
     pageDescription: "Barcha haydovchilarni boshqaring, kuzating va yuk biriktiring",
-
-    // Statistik kartochkalar
     totalDrivers: "Jami Haydovchilar",
     online: "Online",
     offline: "Offline",
     verified: "Tasdiqlangan",
-
-    // Qidiruv va filterlar
     searchPlaceholder: "Haydovchi ismi, ID yoki telefon raqami bo'yicha qidirish...",
     status: "Holat",
     vehicle: "Transport",
     rating: "Reyting",
     addDriver: "Haydovchi qo'shish",
-
-    // Holatlar
     allStatuses: "Barcha holatlar",
     onlineStatus: "Online",
     offlineStatus: "Offline",
     busyStatus: "Band",
-
-    // Transport turlari
     allVehicles: "Barcha transportlar",
     truck: "Yuk mashinasi",
     van: "Furgon",
     pickup: "Pikap",
     refrigerator: "Refrijerator",
-
-    // Reytinglar
     allRatings: "Barcha reytinglar",
     fiveStars: "5 ★",
     fourPlusStars: "4+ ★",
     threePlusStars: "3+ ★",
     twoPlusStars: "2+ ★",
-
-    // Tablar
     allDrivers: "Barcha haydovchilar",
     onlineDrivers: "Online",
     verifiedDrivers: "Tasdiqlangan",
     availableDrivers: "Bo'sh",
     topRated: "Top reyting",
     newlyAdded: "Yangi qo'shilgan",
-
-    // Haydovchi kartasi
     featured: "Featured",
     verifiedBadge: "Tasdiqlangan",
     id: "id",
@@ -100,11 +89,7 @@ const translations = {
     call: "Qo'ng'iroq",
     message: "Xabar",
     assignCargo: "Yuk",
-
-    // Pagination
     paginationInfo: "1-9 of 156 haydovchilar",
-
-    // Modal - Yangi haydovchi qo'shish
     addDriverTitle: "Yangi haydovchi qo'shish",
     driverInfo: "Haydovchi ma'lumotlari",
     username: "Username",
@@ -124,107 +109,79 @@ const translations = {
     loadingMethod: "Yuklash usuli",
     topLoading: "Yuqoridan",
     backLoading: "Orqadan",
-
-    // O'lchamlar
     dimensions: "O'lchamlari",
     length: "Uzunlik (m)",
     height: "Balandlik (m)",
     width: "Kenglik (m)",
-
-    // Sig'im
     capacity: "Sig'imi",
     weight: "Og'irlik (kg)",
     weightRequired: "Og'irlik (kg) *",
     availableTonnage: "Mavjud tonnaj",
     availableVolume: "Mavjud hajm (m³)",
-
-    // Narxlar
     pricing: "Narxlar",
     currency: "Valyuta",
     som: "So'm",
     pricePerKm: "Narx (1 km uchun)",
-
-    // Rasm
     photo: "Rasm",
     vehiclePhoto: "Transport rasmi",
-
-    // Maxfiylik sozlamasi
     publicTransport: "Ommaviy transport",
     publicTransportDesc: "Bu transport barcha foydalanuvchilar uchun ko'rinadi",
-
-    // Amallar
     cancel: "Bekor qilish",
     save: "Saqlash",
-
-    // Haydovchi ma'lumotlari modal
     driverDetails: " ma'lumotlar",
     email: "Email",
-
-    // Yuk biriktirish modal
     assignCargoTitle: " ga yuk biriktirish",
     selectCargo: "Yukni tanlang",
     selectCargoPlaceholder: "Yukni tanlang...",
     additionalInfo: "Qo'shimcha ma'lumot",
     additionalInfoPlaceholder: "Haydovchiga qo'shimcha ko'rsatmalar...",
-
-    // Xabarnoma
     driverAdded: "Yangi haydovchi qo'shildi!",
-
-    // Transport kategoriyalari
     container: "Konteyner",
     platform: "Platforma",
     tanker: "Sisterna",
-
-    // Xatoliklar
-    unknown: "Noma'lum"
+    unknown: "Noma'lum",
+    liveTracking: "Jonli kuzatuv",
+    trackingOffline: "Kuzatuv o'chiq",
+    selectYourTransport: "Transportni tanlang",
+    locationAccuracyWarning: "Joylashuv aniqligi 2km ichida bo'lishi kerak",
+    noLocationAccess: "Joylashuvga ruxsat berilmagan",
+    connectionError: "Ulanish xatosi",
+    reconnect: "Qayta ulanish",
+    updatingLocation: "Joylashuv yangilanmoqda...",
+    locationUpdated: "Joylashuv yangilandi"
   },
   ru: {
-    // Sahifa sarlavhalari
     pageTitle: "Водители",
     pageDescription: "Управляйте, отслеживайте и назначайте грузы всем водителям",
-
-    // Statistik kartochkalar
     totalDrivers: "Всего водителей",
     online: "Онлайн",
     offline: "Офлайн",
     verified: "Подтверждено",
-
-    // Qidiruv va filterlar
     searchPlaceholder: "Поиск по имени водителя, ID или номеру телефона...",
     status: "Статус",
     vehicle: "Транспорт",
     rating: "Рейтинг",
     addDriver: "Добавить водителя",
-
-    // Holatlar
     allStatuses: "Все статусы",
     onlineStatus: "Онлайн",
     offlineStatus: "Офлайн",
     busyStatus: "Занят",
-
-    // Transport turlari
     allVehicles: "Все виды транспорта",
     truck: "Грузовик",
     van: "Фургон",
     pickup: "Пикап",
     refrigerator: "Рефрижератор",
-
-    // Reytinglar
     allRatings: "Все рейтинги",
     fiveStars: "5 ★",
     fourPlusStars: "4+ ★",
     threePlusStars: "3+ ★",
     twoPlusStars: "2+ ★",
-
-    // Tablar
     allDrivers: "Все водители",
     onlineDrivers: "Онлайн",
     verifiedDrivers: "Подтвержденные",
     availableDrivers: "Свободные",
     topRated: "Лучшие по рейтингу",
     newlyAdded: "Новые",
-
-    // Haydovchi kartasi
     featured: "Рекомендуемый",
     verifiedBadge: "Подтверждено",
     id: "ид",
@@ -241,11 +198,7 @@ const translations = {
     call: "Позвонить",
     message: "Сообщение",
     assignCargo: "Груз",
-
-    // Pagination
     paginationInfo: "1-9 из 156 водителей",
-
-    // Modal - Yangi haydovchi qo'shish
     addDriverTitle: "Добавить нового водителя",
     driverInfo: "Информация о водителе",
     username: "Имя пользователя",
@@ -265,107 +218,79 @@ const translations = {
     loadingMethod: "Способ загрузки",
     topLoading: "Сверху",
     backLoading: "Сзади",
-
-    // O'lchamlar
     dimensions: "Размеры",
     length: "Длина (м)",
     height: "Высота (м)",
     width: "Ширина (м)",
-
-    // Sig'im
     capacity: "Вместимость",
     weight: "Вес (кг)",
     weightRequired: "Вес (кг) *",
     availableTonnage: "Доступный тоннаж",
     availableVolume: "Доступный объем (м³)",
-
-    // Narxlar
     pricing: "Цены",
     currency: "Валюта",
     som: "Сум",
     pricePerKm: "Цена (за 1 км)",
-
-    // Rasm
     photo: "Фото",
     vehiclePhoto: "Фото транспорта",
-
-    // Maxfiylik sozlamasi
     publicTransport: "Публичный транспорт",
     publicTransportDesc: "Этот транспорт виден всем пользователям",
-
-    // Amallar
     cancel: "Отмена",
     save: "Сохранить",
-
-    // Haydovchi ma'lumotlari modal
     driverDetails: " информация",
     email: "Email",
-
-    // Yuk biriktirish modal
     assignCargoTitle: " назначить груз",
     selectCargo: "Выберите груз",
     selectCargoPlaceholder: "Выберите груз...",
     additionalInfo: "Дополнительная информация",
     additionalInfoPlaceholder: "Дополнительные инструкции для водителя...",
-
-    // Xabarnoma
     driverAdded: "Новый водитель добавлен!",
-
-    // Transport kategoriyalari
     container: "Контейнер",
     platform: "Платформа",
     tanker: "Цистерна",
-
-    // Xatoliklar
-    unknown: "Неизвестно"
+    unknown: "Неизвестно",
+    liveTracking: "Живое отслеживание",
+    trackingOffline: "Отслеживание отключено",
+    selectYourTransport: "Выберите транспорт",
+    locationAccuracyWarning: "Точность местоположения должна быть в пределах 2км",
+    noLocationAccess: "Доступ к местоположению не разрешен",
+    connectionError: "Ошибка подключения",
+    reconnect: "Переподключиться",
+    updatingLocation: "Обновление местоположения...",
+    locationUpdated: "Местоположение обновлено"
   },
   en: {
-    // Sahifa sarlavhalari
     pageTitle: "Drivers",
     pageDescription: "Manage, track and assign cargo to all drivers",
-
-    // Statistik kartochkalar
     totalDrivers: "Total Drivers",
     online: "Online",
     offline: "Offline",
     verified: "Verified",
-
-    // Qidiruv va filterlar
     searchPlaceholder: "Search by driver name, ID or phone number...",
     status: "Status",
     vehicle: "Vehicle",
     rating: "Rating",
     addDriver: "Add Driver",
-
-    // Holatlar
     allStatuses: "All Statuses",
     onlineStatus: "Online",
     offlineStatus: "Offline",
     busyStatus: "Busy",
-
-    // Transport turlari
     allVehicles: "All Vehicles",
     truck: "Truck",
     van: "Van",
     pickup: "Pickup",
     refrigerator: "Refrigerator",
-
-    // Reytinglar
     allRatings: "All Ratings",
     fiveStars: "5 ★",
     fourPlusStars: "4+ ★",
     threePlusStars: "3+ ★",
     twoPlusStars: "2+ ★",
-
-    // Tablar
     allDrivers: "All Drivers",
     onlineDrivers: "Online",
     verifiedDrivers: "Verified",
     availableDrivers: "Available",
     topRated: "Top Rated",
     newlyAdded: "Newly Added",
-
-    // Haydovchi kartasi
     featured: "Featured",
     verifiedBadge: "Verified",
     id: "id",
@@ -382,11 +307,7 @@ const translations = {
     call: "Call",
     message: "Message",
     assignCargo: "Cargo",
-
-    // Pagination
     paginationInfo: "1-9 of 156 drivers",
-
-    // Modal - Yangi haydovchi qo'shish
     addDriverTitle: "Add New Driver",
     driverInfo: "Driver Information",
     username: "Username",
@@ -406,59 +327,46 @@ const translations = {
     loadingMethod: "Loading Method",
     topLoading: "Top",
     backLoading: "Back",
-
-    // O'lchamlar
     dimensions: "Dimensions",
     length: "Length (m)",
     height: "Height (m)",
     width: "Width (m)",
-
-    // Sig'im
     capacity: "Capacity",
     weight: "Weight (kg)",
     weightRequired: "Weight (kg) *",
     availableTonnage: "Available Tonnage",
     availableVolume: "Available Volume (m³)",
-
-    // Narxlar
     pricing: "Pricing",
     currency: "Currency",
     som: "UZS",
     pricePerKm: "Price (per 1 km)",
-
-    // Rasm
     photo: "Photo",
     vehiclePhoto: "Vehicle Photo",
-
-    // Maxfiylik sozlamasi
     publicTransport: "Public Transport",
     publicTransportDesc: "This vehicle is visible to all users",
-
-    // Amallar
     cancel: "Cancel",
     save: "Save",
-
-    // Haydovchi ma'lumotlari modal
     driverDetails: " Information",
     email: "Email",
-
-    // Yuk biriktirish modal
     assignCargoTitle: " Assign Cargo",
     selectCargo: "Select Cargo",
     selectCargoPlaceholder: "Select cargo...",
     additionalInfo: "Additional Information",
     additionalInfoPlaceholder: "Additional instructions for driver...",
-
-    // Xabarnoma
     driverAdded: "New driver added!",
-
-    // Transport kategoriyalari
     container: "Container",
     platform: "Platform",
     tanker: "Tanker",
-
-    // Xatoliklar
-    unknown: "Unknown"
+    unknown: "Unknown",
+    liveTracking: "Live Tracking",
+    trackingOffline: "Tracking Offline",
+    selectYourTransport: "Select Your Transport",
+    locationAccuracyWarning: "Location accuracy must be within 2km",
+    noLocationAccess: "Location access not granted",
+    connectionError: "Connection Error",
+    reconnect: "Reconnect",
+    updatingLocation: "Updating location...",
+    locationUpdated: "Location updated"
   }
 };
 
@@ -477,7 +385,7 @@ function StarRating({ rating }) {
   );
 }
 
-// Stat Card Component - Now extracted
+// Stat Card Component
 function StatCard({ title, value, trend, trendUp, icon: Icon, gradient, t }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 relative overflow-hidden transition-all hover:-translate-y-2 duration-300 hover:shadow-xl">
@@ -539,8 +447,81 @@ function Modal({ isOpen, title, children, onClose }) {
   );
 }
 
-// Driver Card Component
-function DriverCard({ driver, t }) {
+// Mini Map Component for Driver Card
+function MiniMap({ lat, lon, driverId, driverName, isOnline }) {
+  const mapContainer = useRef(null);
+  const map = useRef(null);
+  const marker = useRef(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || !lat || !lon) return;
+
+    if (!map.current) {
+      // Initialize map
+      map.current = new window.maplibregl.Map({
+        container: mapContainer.current,
+        style: 'https://demotiles.maplibre.org/style.json',
+        center: [lon, lat],
+        zoom: 12,
+        interactive: false,
+        attributionControl: false
+      });
+
+      map.current.on('load', () => {
+        // Add marker
+        marker.current = new window.maplibregl.Marker({
+          color: isOnline ? '#10B981' : '#EF4444',
+          element: createCustomMarker(isOnline)
+        })
+          .setLngLat([lon, lat])
+          .addTo(map.current);
+      });
+    } else {
+      // Update marker position
+      if (marker.current) {
+        marker.current.setLngLat([lon, lat]);
+      }
+      map.current.setCenter([lon, lat]);
+    }
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, [lat, lon, isOnline]);
+
+  const createCustomMarker = (online) => {
+    const el = document.createElement('div');
+    el.className = 'custom-marker';
+    el.innerHTML = `
+      <div class="relative">
+        <div class="w-6 h-6 ${online ? 'bg-green-500' : 'bg-red-500'} rounded-full border-2 border-white shadow-lg flex items-center justify-center">
+          <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        ${online ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>' : ''}
+      </div>
+    `;
+    return el;
+  };
+
+  return (
+    <div className="h-48 rounded-xl relative overflow-hidden">
+      <div ref={mapContainer} className="w-full h-full" />
+      <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+        {driverName}
+      </div>
+    </div>
+  );
+}
+
+// Driver Card Component with Real-time Location
+function DriverCard({ driver, t, position, isOnline }) {
+  const hasPosition = position && position[0] && position[1];
+  
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
       {/* Featured Badge */}
@@ -552,7 +533,7 @@ function DriverCard({ driver, t }) {
           <div className="w-20 h-20 bg-linear-to-br from-blue-600 to-purple-700 rounded-full flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-sm">
             {driver.owner_first_name?.charAt(0) || 'D'}{driver.owner_last_name?.charAt(0) || 'D'}
           </div>
-          <div className="absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-white bg-green-500"></div>
+          <div className={`absolute bottom-1 right-1 w-5 h-5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -563,7 +544,8 @@ function DriverCard({ driver, t }) {
           <div className="font-mono text-sm text-gray-500 mb-2">{t.id}</div>
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <FaMapMarkerAlt className="text-blue-600 w-3 h-3" />
-            {t.location}
+            {hasPosition ? t.realTimeLocation : t.location}
+            {hasPosition && <FaLocationArrow className="text-green-500 w-3 h-3 animate-pulse" />}
           </div>
         </div>
       </div>
@@ -574,7 +556,6 @@ function DriverCard({ driver, t }) {
           <div>
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.phone}</div>
             <div className="font-semibold text-gray-900 font-mono">+998992221133</div>
-            {/* {console.log(driver)} */}
           </div>
           <div>
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.vehicleType}</div>
@@ -586,22 +567,34 @@ function DriverCard({ driver, t }) {
           </div>
           <div>
             <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{t.statusCol}</div>
-            <div className="font-semibold text-gray-900">{t.onlineStatusCol}</div>
-          </div>
-        </div>
-
-        {/* Map Placeholder */}
-        <div className="h-48 bg-linear-to-br from-cyan-50 to-blue-100 rounded-xl mt-4 relative">
-          <div className="absolute w-6 h-6 bg-blue-600 rounded-full border-4 border-white shadow-md" style={{ top: '40%', left: '30%' }}>
-            <div className="absolute w-2 h-2 bg-white rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center text-gray-600">
-            <div className="text-center">
-              <FaMapMarkedAlt className="text-4xl mb-2 mx-auto" />
-              <div>{t.realTimeLocation}</div>
+            <div className={`font-semibold ${isOnline ? 'text-green-600' : 'text-gray-600'}`}>
+              {isOnline ? t.onlineStatusCol : t.offlineStatus}
             </div>
           </div>
         </div>
+
+        {/* Map */}
+        {hasPosition ? (
+          <MiniMap 
+            lat={position[0]} 
+            lon={position[1]} 
+            driverId={driver.id}
+            driverName={`${driver.owner_first_name || ''} ${driver.owner_last_name || ''}`}
+            isOnline={isOnline}
+          />
+        ) : (
+          <div className="h-48 bg-linear-to-br from-cyan-50 to-blue-100 rounded-xl mt-4 relative">
+            <div className="absolute w-6 h-6 bg-gray-400 rounded-full border-4 border-white shadow-md" style={{ top: '40%', left: '30%' }}>
+              <div className="absolute w-2 h-2 bg-white rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+              <div className="text-center">
+                <FaMapMarkedAlt className="text-4xl mb-2 mx-auto" />
+                <div>{isOnline ? t.realTimeLocation : t.offlineStatus}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Stats */}
@@ -645,13 +638,26 @@ function Haydovchilar({ currentLang }) {
   const [showNotification, setShowNotification] = useState(false);
   const [showAddDriverModal, setShowAddDriverModal] = useState(false);
   const [transportData, setTransportData] = useState([]);
+  const [positions, setPositions] = useState({});
+  const [onlineDrivers, setOnlineDrivers] = useState(new Set());
+  const [userTransports, setUserTransports] = useState([]);
+  const [selectedTransportId, setSelectedTransportId] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState('disconnected');
+  const [lastLocationUpdate, setLastLocationUpdate] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  
+  // Refs for WebSocket and interval
+  const wsRef = useRef(null);
+  const locationIntervalRef = useRef(null);
+  const reconnectTimeoutRef = useRef(null);
 
-  // Form states for adding new transport/driver according to API structure
+  // Form states
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [ownerFirstName, setOwnerFirstName] = useState('');
   const [ownerLastName, setOwnerLastName] = useState('');
-  const [ownerUsername, setOwnerUsername] = useState('admin'); // Default as per API
+  const [ownerUsername, setOwnerUsername] = useState('admin');
   const [availableTonnage, setAvailableTonnage] = useState('');
   const [availableVolume, setAvailableVolume] = useState('');
   const [bodyType, setBodyType] = useState('');
@@ -666,21 +672,293 @@ function Haydovchilar({ currentLang }) {
   const [isPublic, setIsPublic] = useState(false);
   const [photo, setPhoto] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      const baseUrl = 'https://tokennoty.pythonanywhere.com/api/transport/'
-      const res = await fetch(baseUrl)
-      const transports = await res.json()
+  // Get current user information
+  const getCurrentUser = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log('No token found');
+        return null;
+      }
+
+      const response = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
+        headers: {
+          'Authorization': `token ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setCurrentUser(userData);
+        return userData;
+      } else {
+        console.error('Failed to fetch user:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+    return null;
+  }, []);
+
+  // Get user's transports
+  const getUserTransports = useCallback(async (username) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log('No token for transport fetch');
+        return [];
+      }
+
+      const response = await fetch(`https://tokennoty.pythonanywhere.com/api/transport/?owner__username=${username}`, {
+        headers: {
+          'Authorization': `token ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserTransports(data);
+        if (data.length > 0) {
+          // Try to get selected transport from localStorage or use first one
+          const savedTransportId = localStorage.getItem('selectedTransportId');
+          if (savedTransportId && data.some(t => t.id === parseInt(savedTransportId))) {
+            setSelectedTransportId(parseInt(savedTransportId));
+          } else {
+            setSelectedTransportId(data[0].id);
+            localStorage.setItem('selectedTransportId', data[0].id);
+          }
+        }
+        return data;
+      }
+    } catch (error) {
+      console.error('Error fetching user transports:', error);
+    }
+    return [];
+  }, []);
+
+  // Get all transports data
+  const getAllTransports = useCallback(async () => {
+    try {
+      const baseUrl = 'https://tokennoty.pythonanywhere.com/api/transport/';
+      const res = await fetch(baseUrl);
+      if (!res.ok) throw new Error('Failed to fetch transports');
+      
+      const transports = await res.json();
       const result = await Promise.all(
         transports.map(async (item) => {
-          const starsRes = await fetch(`${baseUrl}${item.id}/stars/`)
-          const stars = await starsRes.json()
-          return { ...item, stars }
-        }))
-      setTransportData(result)
-    })()
+          try {
+            const starsRes = await fetch(`${baseUrl}${item.id}/stars/`);
+            const stars = await starsRes.json();
+            return { ...item, stars };
+          } catch (error) {
+            console.error(`Error fetching stars for transport ${item.id}:`, error);
+            return { ...item, stars: [] };
+          }
+        })
+      );
+      setTransportData(result);
+    } catch (error) {
+      console.error('Error fetching transport data:', error);
+    }
   }, []);
-  // console.log(transportData);
+
+  // Initialize WebSocket connection
+  const initWebSocket = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !selectedTransportId) {
+      console.log('No token or transport selected');
+      setConnectionStatus('disconnected');
+      return;
+    }
+
+    // Clear existing reconnection timeout
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    // Close existing connection
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    // Construct WebSocket URL
+    const wsUrl = `wss://tokennoty.pythonanywhere.com/ws/geolocation/transport/${token}/?pk=${selectedTransportId}`;
+    
+    try {
+      setConnectionStatus('connecting');
+      wsRef.current = new WebSocket(wsUrl);
+
+      wsRef.current.onopen = () => {
+        console.log('WebSocket connected');
+        setConnectionStatus('connected');
+        setLocationError(null);
+        // Start sending location updates
+        startLocationUpdates();
+      };
+
+      wsRef.current.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.type === 'message') {
+            // Update single transport position
+            const { pk, pos } = data;
+            setPositions(prev => ({
+              ...prev,
+              [pk]: pos
+            }));
+            // Mark as online
+            setOnlineDrivers(prev => new Set([...prev, parseInt(pk)]));
+            
+            // If this is our own transport, update last location time
+            if (parseInt(pk) === selectedTransportId) {
+              setLastLocationUpdate(new Date());
+            }
+          } else if (typeof data === 'object') {
+            // Initial positions of all transports
+            const newPositions = {};
+            const onlineIds = new Set();
+            
+            Object.entries(data).forEach(([pk, pos]) => {
+              if (Array.isArray(pos) && pos.length === 2) {
+                const pkNum = parseInt(pk);
+                newPositions[pkNum] = pos;
+                onlineIds.add(pkNum);
+                
+                // If this is our own transport, update last location time
+                if (pkNum === selectedTransportId) {
+                  setLastLocationUpdate(new Date());
+                }
+              }
+            });
+            
+            setPositions(newPositions);
+            setOnlineDrivers(onlineIds);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      wsRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setConnectionStatus('error');
+        setLocationError(t.connectionError);
+      };
+
+      wsRef.current.onclose = (event) => {
+        console.log('WebSocket disconnected:', event.code, event.reason);
+        setConnectionStatus('disconnected');
+        // Clear all online status on disconnect
+        setOnlineDrivers(new Set());
+        
+        // Try to reconnect after 5 seconds if not manually closed
+        if (event.code !== 1000) { // 1000 is normal closure
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (selectedTransportId) {
+              initWebSocket();
+            }
+          }, 5000);
+        }
+      };
+
+    } catch (error) {
+      console.error('Error creating WebSocket:', error);
+      setConnectionStatus('error');
+      setLocationError(t.connectionError);
+    }
+  }, [selectedTransportId, t]);
+
+  // Start sending location updates
+  const startLocationUpdates = () => {
+    // Clear existing interval
+    if (locationIntervalRef.current) {
+      clearInterval(locationIntervalRef.current);
+    }
+
+    locationIntervalRef.current = setInterval(() => {
+      if (!selectedTransportId || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude, accuracy } = position.coords;
+            
+            // Check accuracy (must be within 2 kilometers = 2000 meters)
+            if (accuracy <= 2000) {
+              const posData = {
+                pos: [latitude, longitude]
+              };
+              
+              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify(posData));
+                setLastLocationUpdate(new Date());
+                setLocationError(null);
+              }
+            } else {
+              console.warn(`Location accuracy too low: ${accuracy}m`);
+              setLocationError(`${t.locationAccuracyWarning} (${Math.round(accuracy)}m)`);
+            }
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            setLocationError(t.noLocationAccess);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000
+          }
+        );
+      }
+    }, 5000); // Update every 5 seconds
+  };
+
+  // Initialize everything
+  useEffect(() => {
+    const initialize = async () => {
+      // Get all transport data
+      await getAllTransports();
+
+      // Get user and setup WebSocket
+      const user = await getCurrentUser();
+      if (user) {
+        await getUserTransports(user.username);
+      }
+    };
+
+    initialize();
+
+    // Cleanup
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close(1000, 'Component unmounting');
+      }
+      if (locationIntervalRef.current) {
+        clearInterval(locationIntervalRef.current);
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+    };
+  }, [getCurrentUser, getUserTransports, getAllTransports]);
+
+  // Reinitialize WebSocket when selectedTransportId changes
+  useEffect(() => {
+    if (selectedTransportId) {
+      initWebSocket();
+    }
+  }, [selectedTransportId, initWebSocket]);
+
+  // Transport selection handler
+  const handleTransportSelect = (transportId) => {
+    setSelectedTransportId(transportId);
+    localStorage.setItem('selectedTransportId', transportId);
+    // WebSocket will reconnect automatically due to useEffect
+  };
 
   // Tab Component
   function Tab({ id, label, badge, active }) {
@@ -773,7 +1051,7 @@ function Haydovchilar({ currentLang }) {
       transportation_rate_per_km: transportationRatePerKm ? parseFloat(transportationRatePerKm) : null,
       public: isPublic,
       phone_number: '1234',
-      photo: photo, // This should be handled as a file upload
+      photo: photo,
     };
 
     console.log('Form data to be posted:', formData);
@@ -792,12 +1070,9 @@ function Haydovchilar({ currentLang }) {
 
       if (response.ok) {
         alert("Yuk muvaffaqiyatli qo'shildi!");
-        // Ro'yxatni yangilash
-        // Modalni yopish
       }
     } catch (err) {
       console.error("Tarmoq xatosi:", err);
-      // alert("Server bilan aloqa yo'q yoki internet past.");
     }
 
     // Close modal and show notification
@@ -832,21 +1107,135 @@ function Haydovchilar({ currentLang }) {
     }
   };
 
+  // Filter transports based on active tab
+  const filteredTransports = React.useMemo(() => {
+    let filtered = transportData;
+    
+    switch (activeTab) {
+      case 'online':
+        filtered = filtered.filter(driver => onlineDrivers.has(driver.id));
+        break;
+      case 'verified':
+        filtered = filtered.filter(driver => driver.verified);
+        break;
+      case 'available':
+        filtered = filtered.filter(driver => !onlineDrivers.has(driver.id));
+        break;
+      case 'top':
+        filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+        break;
+      case 'new':
+        filtered = [...filtered].sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        );
+        break;
+      default:
+        break;
+    }
+    
+    return filtered;
+  }, [transportData, activeTab, onlineDrivers]);
+
+  // Transport selection modal
+  const TransportSelectionModal = () => {
+    if (userTransports.length === 0 || selectedTransportId) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+          <h3 className="text-xl font-bold mb-4">{t.selectYourTransport}</h3>
+          <p className="text-gray-600 mb-4">
+            {t.selectYourTransport}:
+          </p>
+          <div className="space-y-2">
+            {userTransports.map(transport => (
+              <button
+                key={transport.id}
+                className="w-full p-3 border border-gray-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition-all text-left"
+                onClick={() => handleTransportSelect(transport.id)}
+              >
+                <div className="font-semibold">{transport.vehicle_category}</div>
+                <div className="text-sm text-gray-500">ID: {transport.id}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Format time since last update
+  const formatTimeSince = (date) => {
+    if (!date) return 'Never';
+    const seconds = Math.floor((new Date() - date) / 1000);
+    if (seconds < 60) return `${seconds}s ago`;
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    return `${hours}h ago`;
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50/10 to-purple-50/10 font-sans text-gray-800">
+      <TransportSelectionModal />
+      
+      {/* Connection Status Indicator */}
+      <div className="fixed top-4 right-4 z-40 flex flex-col gap-2 items-end">
+        <div className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${connectionStatus === 'connected' ? 'bg-green-100 text-green-800' : connectionStatus === 'connecting' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500 animate-pulse' : connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
+          {connectionStatus === 'connected' ? t.liveTracking : connectionStatus === 'connecting' ? t.updatingLocation : t.trackingOffline}
+          {connectionStatus === 'error' && (
+            <button 
+              onClick={() => initWebSocket()}
+              className="text-xs underline ml-2"
+            >
+              {t.reconnect}
+            </button>
+          )}
+        </div>
+        
+        {/* {selectedTransportId && (
+          <div className="text-xs bg-white/90 backdrop-blur-sm px-2 py-1 rounded border border-gray-200 shadow-sm">
+            <div className="text-gray-600">Tracking: <span className="font-semibold">Transport #{selectedTransportId}</span></div>
+            {lastLocationUpdate && (
+              <div className="text-gray-500">Last update: {formatTimeSince(lastLocationUpdate)}</div>
+            )}
+          </div>
+        )} */}
+      </div>
+
       <main className="py-12">
         <div className="container mx-auto px-6">
           {/* Header */}
           <div className="mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">{t.pageTitle}</h1>
-            <p className="text-gray-600 text-lg">{t.pageDescription}</p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 mb-3">{t.pageTitle}</h1>
+                <p className="text-gray-600 text-lg">{t.pageDescription}</p>
+              </div>
+              {selectedTransportId && userTransports.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <select
+                    className="text-sm text-gray-500 border border-gray-300 rounded-lg px-3 py-1 bg-white"
+                    value={selectedTransportId}
+                    onChange={(e) => handleTransportSelect(parseInt(e.target.value))}
+                  >
+                    {userTransports.map(transport => (
+                      <option key={transport.id} value={transport.id}>
+                        Transport #{transport.id} ({transport.vehicle_category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <StatCard title={t.totalDrivers} value={transportData.length} trend="15%" trendUp={true} icon={FaUsers} gradient="from-blue-600 to-purple-700" t={t} />
-            <StatCard title={t.online} value="0" trend="8%" trendUp={true} icon={FaWifi} gradient="from-cyan-400 to-cyan-500" t={t} />
-            <StatCard title={t.offline} value="0" trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" t={t} />
+            <StatCard title={t.online} value={onlineDrivers.size} trend="8%" trendUp={true} icon={FaWifi} gradient="from-cyan-400 to-cyan-500" t={t} />
+            <StatCard title={t.offline} value={transportData.length - onlineDrivers.size} trend="3%" trendUp={false} icon={FaUserSlash} gradient="from-yellow-500 to-orange-400" t={t} />
             <StatCard title={t.verified} value={transportData.length} trend="24%" trendUp={true} icon={FaCheckCircle} gradient="from-purple-700 to-blue-600" t={t} />
           </div>
 
@@ -874,7 +1263,7 @@ function Haydovchilar({ currentLang }) {
           {/* Tabs */}
           <div className="flex border-b border-gray-200 mb-6 overflow-x-auto">
             <Tab id="all" label={t.allDrivers} active={activeTab === 'all'} />
-            <Tab id="online" label={t.onlineDrivers} active={activeTab === 'online'} />
+            <Tab id="online" label={t.onlineDrivers} badge={onlineDrivers.size} active={activeTab === 'online'} />
             <Tab id="verified" label={t.verifiedDrivers} active={activeTab === 'verified'} />
             <Tab id="available" label={t.availableDrivers} active={activeTab === 'available'} />
             <Tab id="top" label={t.topRated} active={activeTab === 'top'} />
@@ -883,8 +1272,14 @@ function Haydovchilar({ currentLang }) {
 
           {/* Drivers Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-12">
-            {transportData.map(driver => (
-              <DriverCard key={driver.id} driver={driver} t={t} />
+            {filteredTransports.map(driver => (
+              <DriverCard 
+                key={driver.id} 
+                driver={driver} 
+                t={t}
+                position={positions[driver.id]}
+                isOnline={onlineDrivers.has(driver.id)}
+              />
             ))}
           </div>
 
@@ -1229,6 +1624,14 @@ function Haydovchilar({ currentLang }) {
         <div className="fixed top-6 right-6 p-4 rounded-xl shadow-lg z-50 flex items-center gap-3 bg-green-500 text-white animate-slide-in">
           <FaCheckCircle />
           <span>{t.driverAdded}</span>
+        </div>
+      )}
+
+      {/* Location Accuracy Warning */}
+      {locationError && (
+        <div className="fixed bottom-4 right-4 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+          <FaExclamationTriangle />
+          {locationError}
         </div>
       )}
     </div>
