@@ -114,108 +114,48 @@ const Navbar = ({ currentLang, onLangChange }) => {
     `${isActive ? 'text-white bg-[#4361ee]' : 'text-gray-600 hover:text-white hover:bg-[#4361ee]'} font-semibold cursor-pointer duration-300 rounded-xl px-4 py-2 transition-all`;
 
   return (
-    <nav className='h-20 flex items-center bg-white shadow-md sticky top-0 z-50'>
-      <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
+    <>
+      {/* Black overlay - Only covers area outside navbar and menu */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/20 bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsOpen(false)}
+          style={{ top: '5rem' }} // Start overlay below navbar
+        />
+      )}
+      
+      <nav className='h-20 flex items-center bg-white shadow-md sticky top-0 z-50'>
+        <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
 
-        {/* Logo */}
-        <div className="flex gap-3 items-center cursor-pointer duration-300 transform hover:scale-105">
-          <div className="w-10 h-10 rounded-lg flex items-center bg-gradient-to-br from-[#4361ee] to-[#7209b7]">
-            <FaTruckLoading className='text-xl text-white m-auto' />
-          </div>
-          <Link to={'/'}>
-            <h2 className='text-2xl text-[#4361ee] font-bold'>Yuk.uz</h2>
-          </Link>
-        </div>
-
-        {/* Desktop Menyu */}
-        <ul className='hidden lg:flex list-none gap-4 items-center'>
-          <NavLink to='/freight/asosiy' className={activeLinkClass}>{t.nav.home}</NavLink>
-          <NavLink to='/freight/yuk' className={activeLinkClass}>{t.nav.freight}</NavLink>
-          <NavLink to='/freight/haydovchilar' className={activeLinkClass}>{t.nav.drivers}</NavLink>
-          <NavLink to='/freight/xarita' className={activeLinkClass}>{t.nav.map}</NavLink>
-          <NavLink to='/freight/narxlar' className={activeLinkClass}>{t.nav.prices}</NavLink>
-          <NavLink to='/freight/yordam' className={activeLinkClass}>{t.nav.help}</NavLink>
-        </ul>
-
-        {/* Right side - All controls */}
-        <div className="flex items-center gap-4">
-          {/* Desktop language selector */}
-          <div className="hidden lg:block relative" ref={langRef}>
-            <div
-              onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-2 px-3 py-2 border-2 border-gray-100 rounded-lg cursor-pointer hover:border-[#4361ee] duration-300 bg-gray-50"
-            >
-              <span className="font-bold text-gray-700">{currentLang?.toUpperCase()}</span>
-              <FaChevronDown className={`text-xs transition-transform ${langOpen ? 'rotate-180' : ''}`} />
+          {/* Logo */}
+          <div className="flex gap-3 items-center cursor-pointer duration-300 transform hover:scale-105">
+            <div className="w-10 h-10 rounded-lg flex items-center bg-gradient-to-br from-[#4361ee] to-[#7209b7]">
+              <FaTruckLoading className='text-xl text-white m-auto' />
             </div>
-
-            {langOpen && (
-              <div className="absolute top-full mt-2 right-0 w-28 bg-white shadow-xl rounded-lg border border-gray-100 overflow-hidden z-50">
-                {languages.map((l) => (
-                  <div
-                    key={l.code}
-                    onClick={() => { onLangChange(l.code); setLangOpen(false); }}
-                    className={`px-4 py-2 hover:bg-gray-100 cursor-pointer font-semibold flex items-center gap-2 ${currentLang === l.code ? 'text-[#4361ee] bg-blue-50' : 'text-gray-600'}`}
-                  >
-                    <img src={l.flag} alt={l.label} className='w-5 h-4 object-cover rounded-sm' /> {l.label}
-                  </div>
-                ))}
-              </div>
-            )}
+            <Link to={'/'}>
+              <h2 className='text-2xl text-[#4361ee] font-bold'>Yuk.uz</h2>
+            </Link>
           </div>
 
-          {/* Desktop user profile or login */}
-          <div className="hidden lg:flex items-center gap-4">
-            {token ? (
-              !isChatPage && (
-                <NavLink 
-                  to='/freight/chat' 
-                  className="w-10 h-10 rounded-full border-2 border-[#4361ee] shadow-md overflow-hidden hover:scale-105 duration-300"
-                >
-                  {photoUrl ? (
-                    <img src={photoUrl} alt="User" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#4361ee] to-[#7209b7] flex items-center justify-center text-white text-lg font-bold">
-                      {user?.first_name ? user.first_name[0] : 'U'}
-                    </div>
-                  )}
-                </NavLink>
-              )
-            ) : (
-              <Link to={'/login'}>
-                <button className='bg-[#4361ee] text-white text-sm font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300'>
-                  {t.register}
-                </button>
-              </Link>
-            )}
-          </div>
+          {/* Desktop Menyu */}
+          <ul className='hidden lg:flex list-none gap-4 items-center'>
+            <NavLink to='/freight/asosiy' className={activeLinkClass}>{t.nav.home}</NavLink>
+            <NavLink to='/freight/yuk' className={activeLinkClass}>{t.nav.freight}</NavLink>
+            <NavLink to='/freight/haydovchilar' className={activeLinkClass}>{t.nav.drivers}</NavLink>
+            <NavLink to='/freight/xarita' className={activeLinkClass}>{t.nav.map}</NavLink>
+            <NavLink to='/freight/narxlar' className={activeLinkClass}>{t.nav.prices}</NavLink>
+            <NavLink to='/freight/yordam' className={activeLinkClass}>{t.nav.help}</NavLink>
+          </ul>
 
-          {/* Mobile controls */}
-          <div className="lg:hidden flex items-center gap-3">
-            {/* User icon for mobile - only show if not on chat page */}
-            {token && !isChatPage && (
-              <NavLink 
-                to='/freight/chat' 
-                className="w-10 h-10 rounded-full border-2 border-[#4361ee] shadow-md overflow-hidden flex-shrink-0"
-                onClick={() => setIsOpen(false)}
-              >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="User" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#4361ee] to-[#7209b7] flex items-center justify-center text-white text-lg font-bold">
-                    {user?.first_name ? user.first_name[0] : 'U'}
-                  </div>
-                )}
-              </NavLink>
-            )}
-
-            {/* Mobile language selector */}
-            <div className="relative hidden sm:block" ref={langRef}>
+          {/* Right side - All controls */}
+          <div className="flex items-center gap-4">
+            {/* Desktop language selector */}
+            <div className="hidden lg:block relative" ref={langRef}>
               <div
                 onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-2 px-3 py-2 border-2 border-gray-100 rounded-lg cursor-pointer hover:border-[#4361ee] duration-300 bg-gray-50"
               >
-                <span className="font-bold text-gray-700 text-sm">{currentLang?.toUpperCase()}</span>
+                <span className="font-bold text-gray-700">{currentLang?.toUpperCase()}</span>
                 <FaChevronDown className={`text-xs transition-transform ${langOpen ? 'rotate-180' : ''}`} />
               </div>
 
@@ -234,27 +174,102 @@ const Navbar = ({ currentLang, onLangChange }) => {
               )}
             </div>
 
-            {/* Mobile Menu Bars - Now on the right side */}
-            <div 
-              className="text-2xl text-[#4361ee] cursor-pointer hover:scale-110 transition-transform"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              {isOpen ? <FaTimes /> : <FaBars />}
+            {/* Desktop user profile or login */}
+            <div className="hidden lg:flex items-center gap-4">
+              {token ? (
+                !isChatPage && (
+                  <NavLink 
+                    to='/freight/chat' 
+                    className="w-10 h-10 rounded-full border-2 border-[#4361ee] shadow-md overflow-hidden hover:scale-105 duration-300"
+                  >
+                    {photoUrl ? (
+                      <img src={photoUrl} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[#4361ee] to-[#7209b7] flex items-center justify-center text-white text-lg font-bold">
+                        {user?.first_name ? user.first_name[0] : 'U'}
+                      </div>
+                    )}
+                  </NavLink>
+                )
+              ) : (
+                <Link to={'/login'}>
+                  <button className='bg-[#4361ee] text-white text-sm font-semibold border-2 border-[#4361ee] rounded-lg py-2 px-5 hover:bg-white hover:text-[#4361ee] duration-300'>
+                    {t.register}
+                  </button>
+                </Link>
+              )}
+            </div>
+
+            {/* Mobile controls */}
+            <div className="lg:hidden flex items-center gap-3">
+              {/* User icon for mobile - only show if not on chat page */}
+              {token && !isChatPage && (
+                <NavLink 
+                  to='/freight/chat' 
+                  className="w-10 h-10 rounded-full border-2 max-lg:hidden border-[#4361ee] shadow-md overflow-hidden flex-shrink-0"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {photoUrl ? (
+                    <img src={photoUrl} alt="User" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#4361ee] to-[#7209b7] flex items-center justify-center text-white text-lg font-bold">
+                      {user?.first_name ? user.first_name[0] : 'U'}
+                    </div>
+                  )}
+                </NavLink>
+              )}
+
+              {/* Mobile language selector */}
+              <div className="relative hidden sm:block" ref={langRef}>
+                <div
+                  onClick={() => setLangOpen(!langOpen)}
+                  className="flex items-center gap-2 px-3 py-2 border-2 border-gray-100 rounded-lg cursor-pointer hover:border-[#4361ee] duration-300 bg-gray-50"
+                >
+                  <span className="font-bold text-gray-700 text-sm">{currentLang?.toUpperCase()}</span>
+                  <FaChevronDown className={`text-xs transition-transform ${langOpen ? 'rotate-180' : ''}`} />
+                </div>
+
+                {langOpen && (
+                  <div className="absolute top-full mt-2 right-0 w-28 bg-white shadow-xl rounded-lg border border-gray-100 overflow-hidden z-50">
+                    {languages.map((l) => (
+                      <div
+                        key={l.code}
+                        onClick={() => { onLangChange(l.code); setLangOpen(false); }}
+                        className={`px-4 py-2 hover:bg-gray-100 cursor-pointer font-semibold flex items-center gap-2 ${currentLang === l.code ? 'text-[#4361ee] bg-blue-50' : 'text-gray-600'}`}
+                      >
+                        <img src={l.flag} alt={l.label} className='w-5 h-4 object-cover rounded-sm' /> {l.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Menu Bars - Now on the right side */}
+              <div 
+                className="text-2xl text-[#4361ee] cursor-pointer hover:scale-110 transition-transform"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                {isOpen ? <FaTimes /> : <FaBars />}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu - Slide from top to bottom */}
+      {/* Mobile Menu - Compact dropdown below navbar with max 2/3 height */}
       <div 
-        className={`fixed top-20 left-0 w-full bg-white shadow-xl transition-all duration-300 ease-in-out lg:hidden z-40 overflow-y-auto ${
-          isOpen ? 'h-[calc(100vh-5rem)] opacity-100' : 'h-0 opacity-0'
+        className={`fixed top-20 left-0 w-full bg-white shadow-xl transition-all duration-300 ease-in-out lg:hidden z-50 ${
+          isOpen ? 'max-h-[66vh] opacity-100 border-t border-gray-200' : 'max-h-0 opacity-0'
         }`}
+        style={{ 
+          overflow: 'hidden',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }}
       >
-        <div className="p-6">
+        <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(66vh - 2rem)' }}>
           {/* Mobile menu user info - only show if not on chat page */}
           {token && !isChatPage && (
-            <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
               <NavLink 
                 to='/freight/chat' 
                 className="w-12 h-12 rounded-full border-2 border-[#4361ee] shadow-md overflow-hidden flex-shrink-0"
@@ -277,7 +292,7 @@ const Navbar = ({ currentLang, onLangChange }) => {
           )}
 
           {/* Mobile menu links */}
-          <ul className='flex flex-col gap-2 mb-6'>
+          <ul className='flex flex-col gap-1 mb-4'>
             <NavLink 
               to='/freight/asosiy' 
               onClick={() => setIsOpen(false)}
@@ -323,17 +338,17 @@ const Navbar = ({ currentLang, onLangChange }) => {
           </ul>
 
           {/* Mobile language selector */}
-          <div className="mb-6">
-            <p className="text-gray-600 font-semibold mb-3">Tilni tanlang:</p>
-            <div className="flex gap-3 justify-center">
+          <div className="mb-4">
+            <p className="text-gray-600 font-semibold mb-2 text-sm">Tilni tanlang:</p>
+            <div className="flex gap-2">
               {languages.map(l => (
                 <button
                   key={l.code}
                   onClick={() => { onLangChange(l.code); setIsOpen(false); }}
-                  className={`flex flex-col items-center justify-center gap-1 py-3 px-4 rounded-lg min-w-[80px] ${currentLang === l.code ? 'bg-[#4361ee] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 px-3 rounded-lg ${currentLang === l.code ? 'bg-[#4361ee] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 >
-                  <img src={l.flag} className="w-8 h-6 rounded-sm" alt={l.label} />
-                  <span className="text-sm font-bold">{l.label}</span>
+                  <img src={l.flag} className="w-6 h-5 rounded-sm" alt={l.label} />
+                  <span className="text-xs font-bold">{l.label}</span>
                 </button>
               ))}
             </div>
@@ -344,22 +359,14 @@ const Navbar = ({ currentLang, onLangChange }) => {
             <Link 
               to={'/login'} 
               onClick={() => setIsOpen(false)} 
-              className='block w-full bg-[#4361ee] text-white text-center rounded-lg py-3 font-semibold hover:bg-[#3a56d4] transition-colors mb-4'
+              className='block w-full bg-[#4361ee] text-white text-center rounded-lg py-3 font-semibold hover:bg-[#3a56d4] transition-colors text-sm'
             >
               {t.register}
             </Link>
           )}
         </div>
       </div>
-
-      {/* Black overlay when menu is open - covers entire screen except navbar */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-    </nav>
+    </>
   );
 };
 

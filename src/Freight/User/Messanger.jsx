@@ -228,7 +228,7 @@ const Messanger = () => {
           </div>
 
           {/* Search */}
-          <div className="relative">
+          <div className="relative max-lg:mt-8">
             <FaSearch className="absolute left-4 top-3.5 text-gray-400" />
             <input
               type="text"
