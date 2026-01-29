@@ -34,9 +34,7 @@ import {
   FaRulerHorizontal,
   FaRulerVertical,
   FaCircle,
-  FaLocationArrow,
-  FaPlug,
-  FaMapPin
+  FaLocationArrow
 } from 'react-icons/fa';
 
 // Tarjimalar obyekti
@@ -142,7 +140,6 @@ const translations = {
     unknown: "Noma'lum",
     liveTracking: "Jonli kuzatuv",
     trackingOffline: "Kuzatuv o'chiq",
-    selectYourTransport: "Transportni tanlang",
     locationAccuracyWarning: "Joylashuv aniqligi 2km ichida bo'lishi kerak",
     noLocationAccess: "Joylashuvga ruxsat berilmagan",
     connectionError: "Ulanish xatosi",
@@ -251,7 +248,6 @@ const translations = {
     unknown: "Неизвестно",
     liveTracking: "Живое отслеживание",
     trackingOffline: "Отслеживание отключено",
-    selectYourTransport: "Выберите транспорт",
     locationAccuracyWarning: "Точность местоположения должна быть в пределах 2км",
     noLocationAccess: "Доступ к местоположению не разрешен",
     connectionError: "Ошибка подключения",
@@ -360,7 +356,6 @@ const translations = {
     unknown: "Unknown",
     liveTracking: "Live Tracking",
     trackingOffline: "Tracking Offline",
-    selectYourTransport: "Select Your Transport",
     locationAccuracyWarning: "Location accuracy must be within 2km",
     noLocationAccess: "Location access not granted",
     connectionError: "Connection Error",
@@ -447,77 +442,6 @@ function Modal({ isOpen, title, children, onClose }) {
   );
 }
 
-// Mini Map Component for Driver Card
-function MiniMap({ lat, lon, driverId, driverName, isOnline }) {
-  const mapContainer = useRef(null);
-  const map = useRef(null);
-  const marker = useRef(null);
-
-  useEffect(() => {
-    if (!mapContainer.current || !lat || !lon) return;
-
-    if (!map.current) {
-      // Initialize map
-      map.current = new window.maplibregl.Map({
-        container: mapContainer.current,
-        style: 'https://demotiles.maplibre.org/style.json',
-        center: [lon, lat],
-        zoom: 12,
-        interactive: false,
-        attributionControl: false
-      });
-
-      map.current.on('load', () => {
-        // Add marker
-        marker.current = new window.maplibregl.Marker({
-          color: isOnline ? '#10B981' : '#EF4444',
-          element: createCustomMarker(isOnline)
-        })
-          .setLngLat([lon, lat])
-          .addTo(map.current);
-      });
-    } else {
-      // Update marker position
-      if (marker.current) {
-        marker.current.setLngLat([lon, lat]);
-      }
-      map.current.setCenter([lon, lat]);
-    }
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, [lat, lon, isOnline]);
-
-  const createCustomMarker = (online) => {
-    const el = document.createElement('div');
-    el.className = 'custom-marker';
-    el.innerHTML = `
-      <div class="relative">
-        <div class="w-6 h-6 ${online ? 'bg-green-500' : 'bg-red-500'} rounded-full border-2 border-white shadow-lg flex items-center justify-center">
-          <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        ${online ? '<div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>' : ''}
-      </div>
-    `;
-    return el;
-  };
-
-  return (
-    <div className="h-48 rounded-xl relative overflow-hidden">
-      <div ref={mapContainer} className="w-full h-full" />
-      <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-        {driverName}
-      </div>
-    </div>
-  );
-}
-
 // Driver Card Component with Real-time Location
 function DriverCard({ driver, t, position, isOnline }) {
   const hasPosition = position && position[0] && position[1];
@@ -575,13 +499,27 @@ function DriverCard({ driver, t, position, isOnline }) {
 
         {/* Map */}
         {hasPosition ? (
-          <MiniMap 
-            lat={position[0]} 
-            lon={position[1]} 
-            driverId={driver.id}
-            driverName={`${driver.owner_first_name || ''} ${driver.owner_last_name || ''}`}
-            isOnline={isOnline}
-          />
+          <div className="h-48 rounded-xl relative overflow-hidden">
+            <div className="w-full h-full bg-linear-to-br from-cyan-50 to-blue-100 relative">
+              {/* Map marker */}
+              <div 
+                className="absolute w-6 h-6 bg-green-500 rounded-full border-4 border-white shadow-md flex items-center justify-center"
+                style={{ 
+                  left: `${50 + (position[1] % 10)}%`, 
+                  top: `${50 + (position[0] % 10)}%` 
+                }}
+              >
+                <div className="absolute w-2 h-2 bg-white rounded-full"></div>
+                {isOnline && <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center text-gray-600">
+                <div className="text-center">
+                  <FaMapMarkedAlt className="text-4xl mb-2 mx-auto" />
+                  <div>{t.realTimeLocation}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="h-48 bg-linear-to-br from-cyan-50 to-blue-100 rounded-xl mt-4 relative">
             <div className="absolute w-6 h-6 bg-gray-400 rounded-full border-4 border-white shadow-md" style={{ top: '40%', left: '30%' }}>
@@ -640,16 +578,11 @@ function Haydovchilar({ currentLang }) {
   const [transportData, setTransportData] = useState([]);
   const [positions, setPositions] = useState({});
   const [onlineDrivers, setOnlineDrivers] = useState(new Set());
-  const [userTransports, setUserTransports] = useState([]);
-  const [selectedTransportId, setSelectedTransportId] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
-  const [lastLocationUpdate, setLastLocationUpdate] = useState(null);
   const [locationError, setLocationError] = useState(null);
   
   // Refs for WebSocket and interval
   const wsRef = useRef(null);
-  const locationIntervalRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
 
   // Form states
@@ -671,70 +604,6 @@ function Haydovchilar({ currentLang }) {
   const [transportationRatePerKm, setTransportationRatePerKm] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [photo, setPhoto] = useState(null);
-
-  // Get current user information
-  const getCurrentUser = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log('No token found');
-        return null;
-      }
-
-      const response = await fetch('https://tokennoty.pythonanywhere.com/api/users/', {
-        headers: {
-          'Authorization': `token ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setCurrentUser(userData);
-        return userData;
-      } else {
-        console.error('Failed to fetch user:', response.status);
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-    return null;
-  }, []);
-
-  // Get user's transports
-  const getUserTransports = useCallback(async (username) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.log('No token for transport fetch');
-        return [];
-      }
-
-      const response = await fetch(`https://tokennoty.pythonanywhere.com/api/transport/?owner__username=${username}`, {
-        headers: {
-          'Authorization': `token ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserTransports(data);
-        if (data.length > 0) {
-          // Try to get selected transport from localStorage or use first one
-          const savedTransportId = localStorage.getItem('selectedTransportId');
-          if (savedTransportId && data.some(t => t.id === parseInt(savedTransportId))) {
-            setSelectedTransportId(parseInt(savedTransportId));
-          } else {
-            setSelectedTransportId(data[0].id);
-            localStorage.setItem('selectedTransportId', data[0].id);
-          }
-        }
-        return data;
-      }
-    } catch (error) {
-      console.error('Error fetching user transports:', error);
-    }
-    return [];
-  }, []);
 
   // Get all transports data
   const getAllTransports = useCallback(async () => {
@@ -762,13 +631,34 @@ function Haydovchilar({ currentLang }) {
     }
   }, []);
 
-  // Initialize WebSocket connection
+  // Initialize WebSocket connection for viewing only (no location sending)
   const initWebSocket = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token || !selectedTransportId) {
-      console.log('No token or transport selected');
+    if (!token) {
+      console.log('No token found');
       setConnectionStatus('disconnected');
       return;
+    }
+
+    // Get first transport ID for WebSocket connection
+    let transportId = null;
+    if (transportData.length > 0) {
+      transportId = transportData[0].id;
+    } else {
+      // If no transport data yet, try to fetch a single transport
+      try {
+        const response = await fetch('https://tokennoty.pythonanywhere.com/api/transport/');
+        const data = await response.json();
+        if (data.length > 0) {
+          transportId = data[0].id;
+        } else {
+          console.log('No transports available for WebSocket connection');
+          return;
+        }
+      } catch (error) {
+        console.error('Error fetching transport for WebSocket:', error);
+        return;
+      }
     }
 
     // Clear existing reconnection timeout
@@ -783,18 +673,16 @@ function Haydovchilar({ currentLang }) {
     }
 
     // Construct WebSocket URL
-    const wsUrl = `wss://tokennoty.pythonanywhere.com/ws/geolocation/transport/${token}/?pk=${selectedTransportId}`;
+    const wsUrl = `wss://tokennoty.pythonanywhere.com/ws/geolocation/transport/${token}/?pk=${transportId}`;
     
     try {
       setConnectionStatus('connecting');
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        console.log('WebSocket connected');
+        console.log('WebSocket connected for viewing');
         setConnectionStatus('connected');
         setLocationError(null);
-        // Start sending location updates
-        startLocationUpdates();
       };
 
       wsRef.current.onmessage = (event) => {
@@ -810,11 +698,6 @@ function Haydovchilar({ currentLang }) {
             }));
             // Mark as online
             setOnlineDrivers(prev => new Set([...prev, parseInt(pk)]));
-            
-            // If this is our own transport, update last location time
-            if (parseInt(pk) === selectedTransportId) {
-              setLastLocationUpdate(new Date());
-            }
           } else if (typeof data === 'object') {
             // Initial positions of all transports
             const newPositions = {};
@@ -825,11 +708,6 @@ function Haydovchilar({ currentLang }) {
                 const pkNum = parseInt(pk);
                 newPositions[pkNum] = pos;
                 onlineIds.add(pkNum);
-                
-                // If this is our own transport, update last location time
-                if (pkNum === selectedTransportId) {
-                  setLastLocationUpdate(new Date());
-                }
               }
             });
             
@@ -856,9 +734,7 @@ function Haydovchilar({ currentLang }) {
         // Try to reconnect after 5 seconds if not manually closed
         if (event.code !== 1000) { // 1000 is normal closure
           reconnectTimeoutRef.current = setTimeout(() => {
-            if (selectedTransportId) {
-              initWebSocket();
-            }
+            initWebSocket();
           }, 5000);
         }
       };
@@ -868,66 +744,16 @@ function Haydovchilar({ currentLang }) {
       setConnectionStatus('error');
       setLocationError(t.connectionError);
     }
-  }, [selectedTransportId, t]);
-
-  // Start sending location updates
-  const startLocationUpdates = () => {
-    // Clear existing interval
-    if (locationIntervalRef.current) {
-      clearInterval(locationIntervalRef.current);
-    }
-
-    locationIntervalRef.current = setInterval(() => {
-      if (!selectedTransportId || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-        return;
-      }
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude, accuracy } = position.coords;
-            
-            // Check accuracy (must be within 2 kilometers = 2000 meters)
-            if (accuracy <= 2000) {
-              const posData = {
-                pos: [latitude, longitude]
-              };
-              
-              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                wsRef.current.send(JSON.stringify(posData));
-                setLastLocationUpdate(new Date());
-                setLocationError(null);
-              }
-            } else {
-              console.warn(`Location accuracy too low: ${accuracy}m`);
-              setLocationError(`${t.locationAccuracyWarning} (${Math.round(accuracy)}m)`);
-            }
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-            setLocationError(t.noLocationAccess);
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 10000
-          }
-        );
-      }
-    }, 5000); // Update every 5 seconds
-  };
+  }, [transportData, t]);
 
   // Initialize everything
   useEffect(() => {
     const initialize = async () => {
       // Get all transport data
       await getAllTransports();
-
-      // Get user and setup WebSocket
-      const user = await getCurrentUser();
-      if (user) {
-        await getUserTransports(user.username);
-      }
+      
+      // Initialize WebSocket connection for viewing
+      initWebSocket();
     };
 
     initialize();
@@ -937,28 +763,11 @@ function Haydovchilar({ currentLang }) {
       if (wsRef.current) {
         wsRef.current.close(1000, 'Component unmounting');
       }
-      if (locationIntervalRef.current) {
-        clearInterval(locationIntervalRef.current);
-      }
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [getCurrentUser, getUserTransports, getAllTransports]);
-
-  // Reinitialize WebSocket when selectedTransportId changes
-  useEffect(() => {
-    if (selectedTransportId) {
-      initWebSocket();
-    }
-  }, [selectedTransportId, initWebSocket]);
-
-  // Transport selection handler
-  const handleTransportSelect = (transportId) => {
-    setSelectedTransportId(transportId);
-    localStorage.setItem('selectedTransportId', transportId);
-    // WebSocket will reconnect automatically due to useEffect
-  };
+  }, [getAllTransports, initWebSocket]);
 
   // Tab Component
   function Tab({ id, label, badge, active }) {
@@ -1136,98 +945,36 @@ function Haydovchilar({ currentLang }) {
     return filtered;
   }, [transportData, activeTab, onlineDrivers]);
 
-  // Transport selection modal
-  const TransportSelectionModal = () => {
-    if (userTransports.length === 0 || selectedTransportId) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-          <h3 className="text-xl font-bold mb-4">{t.selectYourTransport}</h3>
-          <p className="text-gray-600 mb-4">
-            {t.selectYourTransport}:
-          </p>
-          <div className="space-y-2">
-            {userTransports.map(transport => (
-              <button
-                key={transport.id}
-                className="w-full p-3 border border-gray-300 rounded-xl hover:bg-blue-50 hover:border-blue-500 transition-all text-left"
-                onClick={() => handleTransportSelect(transport.id)}
-              >
-                <div className="font-semibold">{transport.vehicle_category}</div>
-                <div className="text-sm text-gray-500">ID: {transport.id}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Format time since last update
-  const formatTimeSince = (date) => {
-    if (!date) return 'Never';
-    const seconds = Math.floor((new Date() - date) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}h ago`;
+  // Reconnect WebSocket
+  const handleReconnect = () => {
+    initWebSocket();
   };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50/10 to-purple-50/10 font-sans text-gray-800">
-      <TransportSelectionModal />
-      
       {/* Connection Status Indicator */}
-      <div className="fixed top-4 right-4 z-40 flex flex-col gap-2 items-end">
+      <div className="fixed top-4 right-4 z-40">
         <div className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${connectionStatus === 'connected' ? 'bg-green-100 text-green-800' : connectionStatus === 'connecting' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
           <div className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500 animate-pulse' : connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
           {connectionStatus === 'connected' ? t.liveTracking : connectionStatus === 'connecting' ? t.updatingLocation : t.trackingOffline}
           {connectionStatus === 'error' && (
             <button 
-              onClick={() => initWebSocket()}
+              onClick={handleReconnect}
               className="text-xs underline ml-2"
             >
               {t.reconnect}
             </button>
           )}
         </div>
-        
-        {/* {selectedTransportId && (
-          <div className="text-xs bg-white/90 backdrop-blur-sm px-2 py-1 rounded border border-gray-200 shadow-sm">
-            <div className="text-gray-600">Tracking: <span className="font-semibold">Transport #{selectedTransportId}</span></div>
-            {lastLocationUpdate && (
-              <div className="text-gray-500">Last update: {formatTimeSince(lastLocationUpdate)}</div>
-            )}
-          </div>
-        )} */}
       </div>
 
       <main className="py-12">
         <div className="container mx-auto px-6">
           {/* Header */}
           <div className="mb-12">
-            <div className="flex justify-between items-start">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-3">{t.pageTitle}</h1>
-                <p className="text-gray-600 text-lg">{t.pageDescription}</p>
-              </div>
-              {selectedTransportId && userTransports.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <select
-                    className="text-sm text-gray-500 border border-gray-300 rounded-lg px-3 py-1 bg-white"
-                    value={selectedTransportId}
-                    onChange={(e) => handleTransportSelect(parseInt(e.target.value))}
-                  >
-                    {userTransports.map(transport => (
-                      <option key={transport.id} value={transport.id}>
-                        Transport #{transport.id} ({transport.vehicle_category})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-3">{t.pageTitle}</h1>
+              <p className="text-gray-600 text-lg">{t.pageDescription}</p>
             </div>
           </div>
 

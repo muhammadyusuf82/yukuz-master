@@ -47,307 +47,13 @@ import maplibregl from 'maplibre-gl';
 import { FaMessage } from "react-icons/fa6";
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-const BASE_HTTP_URL = 'http://127.0.0.1/:8000/api/'
-
-
-// Freight Owner Card Component
-const FreightOwnerCard = ({ ownerData, onChatClick, onOfferClick, showActions = true }) => {
-  if (!ownerData) return null;
-
-  const getInitials = () => {
-    const firstName = ownerData.owner_first_name || '';
-    const lastName = ownerData.owner_last_name || '';
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
-  const renderRatingStars = (rating = 4.8) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 1; i <= 5; i++) {
-      if (i <= fullStars) {
-        stars.push(<FaStar key={i} className="text-yellow-400 text-sm" />);
-      } else if (i === fullStars + 1 && hasHalfStar) {
-        stars.push(<FaStar key={i} className="text-yellow-400 text-sm opacity-50" />);
-      } else {
-        stars.push(<FaStar key={i} className="text-gray-300 text-sm" />);
-      }
-    }
-    return stars;
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-2xl">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 sm:px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
-              <FaUser className="text-white text-lg sm:text-xl" />
-            </div>
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold text-white">Yuk Egasi</h2>
-              <p className="text-blue-100 text-xs sm:text-sm">Tasdiqlangan profil</p>
-            </div>
-          </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 sm:px-3 sm:py-1.5">
-            <span className="text-white text-xs sm:text-sm font-medium">ID: {ownerData.id || 'N/A'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="p-4 sm:p-6">
-        {/* Owner Profile */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-4 mb-6">
-          <div className="relative">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-              <span className="text-white text-xl sm:text-2xl font-bold">
-                {getInitials()}
-              </span>
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1 border-2 border-white">
-              <FaCheckCircle className="text-white text-xs" />
-            </div>
-          </div>
-          
-          <div className="flex-1 text-center md:text-left">
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1">
-              {ownerData.owner_first_name} {ownerData.owner_last_name}
-            </h3>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
-              <div className="flex items-center bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
-                {renderRatingStars()}
-                <span className="ml-1 sm:ml-2 font-semibold">4.8</span>
-              </div>
-              <span className="bg-green-50 text-green-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
-                ✅ 24+ ta yuk
-              </span>
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center text-gray-600">
-                <FaPhone className="text-blue-500 mr-2 text-sm" />
-                <span className="font-medium text-sm sm:text-base">{ownerData.owner_phone || ownerData.owner_username}</span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <FaUser className="text-purple-500 mr-2 text-sm" />
-                <span className="font-medium text-sm sm:text-base">@{ownerData.owner_username}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-6">
-          <div className="bg-blue-50 p-2 sm:p-3 rounded-xl text-center">
-            <div className="text-blue-600 font-bold text-base sm:text-lg">98%</div>
-            <div className="text-xs text-gray-600">Muvaffaqiyat</div>
-          </div>
-          <div className="bg-green-50 p-2 sm:p-3 rounded-xl text-center">
-            <div className="text-green-600 font-bold text-base sm:text-lg">24+</div>
-            <div className="text-xs text-gray-600">Yuklar</div>
-          </div>
-          <div className="bg-purple-50 p-2 sm:p-3 rounded-xl text-center">
-            <div className="text-purple-600 font-bold text-base sm:text-lg">2.4</div>
-            <div className="text-xs text-gray-600">Yillik tajriba</div>
-          </div>
-          <div className="bg-orange-50 p-2 sm:p-3 rounded-xl text-center">
-            <div className="text-orange-600 font-bold text-base sm:text-lg">100%</div>
-            <div className="text-xs text-gray-600">To'lov</div>
-          </div>
-        </div>
-
-        {/* Verification Badges */}
-        <div className="mb-6">
-          <h4 className="text-xs sm:text-sm font-semibold text-gray-500 mb-2 sm:mb-3">Tasdiqlangan ma'lumotlar</h4>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center bg-green-50 text-green-700 px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
-              <FaShieldAlt className="mr-1 sm:mr-2 text-sm" />
-              <span className="text-xs sm:text-sm">Telefon tasdiqlangan</span>
-            </div>
-            <div className="flex items-center bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 sm:py-2 rounded-lg">
-              <FaCheckCircle className="mr-1 sm:mr-2 text-sm" />
-              <span className="text-xs sm:text-sm">Profil tasdiqlangan</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Info */}
-        <div className="bg-gray-50 rounded-xl p-3 sm:p-4 mb-6">
-          <h4 className="font-semibold text-gray-700 mb-2 sm:mb-3 text-sm sm:text-base">Tezkor ma'lumot</h4>
-          <div className="space-y-1 sm:space-y-2">
-            <div className="flex justify-between items-center text-xs sm:text-sm">
-              <span className="text-gray-600">To'lov vaqti:</span>
-              <span className="font-semibold text-gray-800">{ownerData.payment_period === 0 ? 'Darhol' : `${ownerData.payment_period} kun`}</span>
-            </div>
-            <div className="flex justify-between items-center text-xs sm:text-sm">
-              <span className="text-gray-600">To'lov usuli:</span>
-              <span className="font-semibold text-gray-800">{ownerData.payment_method === 'cash' ? 'Naqd' : 'Bank'}</span>
-            </div>
-            <div className="flex justify-between items-center text-xs sm:text-sm">
-              <span className="text-gray-600">Faol yuklar:</span>
-              <span className="font-semibold text-gray-800">3 ta</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        {showActions && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
-            <button
-              onClick={onChatClick}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3 sm:py-3.5 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center text-sm sm:text-base"
-            >
-              <FaMessage className="mr-2" />
-              Chat qilish
-            </button>
-            <button
-              onClick={onOfferClick}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 sm:py-3.5 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center text-sm sm:text-base"
-            >
-              <FaCalendarAlt className="mr-2" />
-              Taklif berish
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="bg-gray-50 px-4 sm:px-6 py-2 sm:py-3 border-t border-gray-200">
-        <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500">
-          <div className="flex items-center">
-            <FaMapMarkerAlt className="mr-1 sm:mr-2" />
-            <span>Faol yukchi</span>
-          </div>
-          <div className="text-right">
-            <span className="text-green-600 font-medium">Online</span>
-            <span className="ml-1 sm:ml-2">• 5 daqiqa oldin</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Mobile-optimized version
-const FreightOwnerCardMobile = ({ ownerData, onChatClick, onOfferClick }) => {
-  if (!ownerData) return null;
-
-  const getInitials = () => {
-    const firstName = ownerData.owner_first_name || '';
-    const lastName = ownerData.owner_last_name || '';
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
-  return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-      {/* Compact Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-purple-500 px-3 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-              <span className="text-white font-bold text-base">{getInitials()}</span>
-            </div>
-            <div>
-              <h3 className="text-white font-bold text-xs">
-                {ownerData.owner_first_name} {ownerData.owner_last_name}
-              </h3>
-              <div className="flex items-center">
-                <FaStar className="text-yellow-300 text-xs mr-1" />
-                <span className="text-white/90 text-xs">4.8 • 24+ yuk</span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white/20 rounded-full px-1.5 py-0.5">
-            <FaCheckCircle className="text-white text-xs" />
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-3">
-        {/* Contact Info */}
-        <div className="space-y-2 mb-3">
-          <div className="flex items-center text-gray-700">
-            <FaPhone className="text-blue-500 text-xs mr-1.5" />
-            <span className="text-xs font-medium">{ownerData.owner_phone || ownerData.owner_username}</span>
-          </div>
-          <div className="flex items-center text-gray-700">
-            <FaUser className="text-purple-500 text-xs mr-1.5" />
-            <span className="text-xs">@{ownerData.owner_username}</span>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-1.5 mb-3">
-          <div className="text-center p-1.5 bg-blue-50 rounded-lg">
-            <div className="text-blue-600 font-bold text-sm">98%</div>
-            <div className="text-xs text-gray-600">Muvaffaqiyat</div>
-          </div>
-          <div className="text-center p-1.5 bg-green-50 rounded-lg">
-            <div className="text-green-600 font-bold text-sm">100%</div>
-            <div className="text-xs text-gray-600">To'lov</div>
-          </div>
-          <div className="text-center p-1.5 bg-purple-50 rounded-lg">
-            <div className="text-purple-600 font-bold text-sm">2.4</div>
-            <div className="text-xs text-gray-600">Yil</div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="space-y-1.5">
-          <button
-            onClick={onChatClick}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-2 rounded-xl flex items-center justify-center text-sm"
-          >
-            <FaMessage className="mr-1.5" />
-            Chat
-          </button>
-          <button
-            onClick={onOfferClick}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-2 rounded-xl flex items-center justify-center text-sm"
-          >
-            <FaCalendarAlt className="mr-1.5" />
-            Taklif
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Responsive wrapper
-const ResponsiveFreightOwnerCard = ({ ownerData, onChatClick, onOfferClick, showActions = true }) => {
-  return (
-    <>
-      {/* Desktop version */}
-      <div className="hidden md:block">
-        <FreightOwnerCard 
-          ownerData={ownerData} 
-          onChatClick={onChatClick} 
-          onOfferClick={onOfferClick} 
-          showActions={showActions}
-        />
-      </div>
-      
-      {/* Mobile version */}
-      <div className="md:hidden">
-        <FreightOwnerCardMobile 
-          ownerData={ownerData} 
-          onChatClick={onChatClick} 
-          onOfferClick={onOfferClick}
-        />
-      </div>
-    </>
-  );
-};
+const BASE_HTTP_URL = 'http://127.0.0.1:8000/api/'
 
 const FreightDetail = ({ freightId, freightData, onBack }) => {
   const [freight, setFreight] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   
   // Map state
   const mapContainer = useRef(null);
@@ -360,6 +66,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
   const [routeDistance, setRouteDistance] = useState(null);
   const [routeDuration, setRouteDuration] = useState(null);
   const [routeInstructions, setRouteInstructions] = useState([]);
+  const [routeGeometry, setRouteGeometry] = useState(null);
 
   // Modal state
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
@@ -375,7 +82,9 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
   const [modalRouteLoading, setModalRouteLoading] = useState(false);
   const [modalRouteDistance, setModalRouteDistance] = useState(null);
   const [activeModalTab, setActiveModalTab] = useState('offer'); // 'offer', 'map', 'owner'
-  const [modalMapInitialized, setModalMapInitialized] = useState(false);
+
+  // Check if current user is the freight owner
+  const isFreightOwner = currentUser?.username === freight?.owner_username;
 
   // Translation mappings
   const paymentConditionTranslations = {
@@ -389,6 +98,30 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
     "bank_transfer": "Bank o'tkazmasi",
     "card": "Karta"
   };
+
+  // Fetch current user
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      try {
+        const req = await fetch(BASE_HTTP_URL + 'users/', {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        });
+        if (req.ok) {
+          const userData = await req.json();
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+    
+    fetchCurrentUser();
+  }, []);
 
   // Helper function to get location display from the correct field names
   const getLocationDisplay = (locationData) => {
@@ -595,9 +328,9 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
     }
   };
 
-  // Initialize modal map with real road route
+  // Initialize modal map when modal opens
   const initializeModalMap = useCallback(async () => {
-    if (!userMapContainer.current || !freight || !userLocation) return;
+    if (!userMapContainer.current || !freight || !userLocation || userMap) return;
 
     const startLat = parseFloat(freight.route_starts_where_lat) || 41.2995;
     const startLon = parseFloat(freight.route_starts_where_lon) || 69.2401;
@@ -796,7 +529,6 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
     });
 
     setUserMap(mapInstance);
-    setModalMapInitialized(true);
 
     return () => {
       if (mapInstance) {
@@ -804,14 +536,22 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
         setUserMap(null);
       }
     };
-  }, [freight, userLocation]);
+  }, [freight, userLocation, userMap]);
 
-  // Initialize modal map when map tab is active
+  // Initialize modal map when modal opens
   useEffect(() => {
-    if (isOfferModalOpen && activeModalTab === 'map' && !modalMapInitialized && freight && userLocation) {
+    if (isOfferModalOpen && freight && userLocation) {
       initializeModalMap();
     }
-  }, [isOfferModalOpen, activeModalTab, modalMapInitialized, freight, userLocation, initializeModalMap]);
+  }, [isOfferModalOpen, freight, userLocation, initializeModalMap]);
+
+  // Clean up map when modal closes
+  useEffect(() => {
+    if (!isOfferModalOpen && userMap) {
+      userMap.remove();
+      setUserMap(null);
+    }
+  }, [isOfferModalOpen, userMap]);
 
   // Fetch route for main map
   const fetchRoute = useCallback(async (startLon, startLat, endLon, endLat) => {
@@ -860,6 +600,10 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
   const addRouteToMap = useCallback((geometry) => {
     if (!map.current || !geometry) return;
 
+    // Store the geometry for re-adding later
+    setRouteGeometry(geometry);
+
+    // Remove existing layers and source
     if (map.current.getLayer('route')) {
       map.current.removeLayer('route');
     }
@@ -870,6 +614,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
       map.current.removeSource('route');
     }
 
+    // Add new source
     map.current.addSource('route', {
       type: 'geojson',
       data: {
@@ -879,8 +624,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
       }
     });
 
-    routeSourceRef.current = map.current.getSource('route');
-
+    // Add route outline
     map.current.addLayer({
       id: 'route-outline',
       type: 'line',
@@ -896,6 +640,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
       }
     });
 
+    // Add main route line
     map.current.addLayer({
       id: 'route',
       type: 'line',
@@ -914,15 +659,10 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
 
   // Re-add route when map style changes
   const reAddRoute = useCallback(() => {
-    if (routeSourceRef.current && routeSourceRef.current._data) {
-      const geometry = routeSourceRef.current._data.geometry;
-      if (geometry) {
-        setTimeout(() => {
-          addRouteToMap(geometry);
-        }, 100);
-      }
+    if (routeGeometry) {
+      addRouteToMap(routeGeometry);
     }
-  }, [addRouteToMap]);
+  }, [routeGeometry, addRouteToMap]);
 
   // Initialize main map
   useEffect(() => {
@@ -1082,12 +822,12 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
         .addTo(map.current);
 
       try {
-        const routeGeometry = await fetchRoute(startLon, startLat, endLon, endLat);
-        addRouteToMap(routeGeometry);
+        const geometry = await fetchRoute(startLon, startLat, endLon, endLat);
+        addRouteToMap(geometry);
 
-        if (routeGeometry.coordinates && routeGeometry.coordinates.length > 1) {
-          const midIndex = Math.floor(routeGeometry.coordinates.length / 2);
-          const midPoint = routeGeometry.coordinates[midIndex];
+        if (geometry.coordinates && geometry.coordinates.length > 1) {
+          const midIndex = Math.floor(geometry.coordinates.length / 2);
+          const midPoint = geometry.coordinates[midIndex];
           
           const vehicleMarkerEl = document.createElement('div');
           vehicleMarkerEl.innerHTML = `
@@ -1139,7 +879,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
             .addTo(map.current);
         }
 
-        const coordinates = routeGeometry.coordinates || [[startLon, startLat], [endLon, endLat]];
+        const coordinates = geometry.coordinates || [[startLon, startLat], [endLon, endLat]];
         const bounds = new maplibregl.LngLatBounds();
         coordinates.forEach(coord => {
           bounds.extend(coord);
@@ -1237,6 +977,7 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
         unit: 'metric'
       }), 'bottom-left');
       
+      // Re-add the route after style change
       setTimeout(() => {
         reAddRoute();
       }, 300);
@@ -1326,14 +1067,32 @@ const FreightDetail = ({ freightId, freightData, onBack }) => {
       return false;
     }
 
-    const messageText = `Assalomu aleykum, sizning yukingiz bo'yicha ${currentUser.first_name} ${currentUser.last_name} quyidagi taklifni beradi:
+    const price = agreeToGivenPrice ? freight.freight_rate_amount + ' ' + freight.freight_rate_currency : offerPrice + ' ' + freight.freight_rate_currency;
+    const commentText = comments || "yo'q";
 
-taklif etilgan narx - ${agreeToGivenPrice ? freight.freight_rate_amount + ' ' + freight.freight_rate_currency : offerPrice + ' ' + freight.freight_rate_currency}
-yetkazish muddati - ${startDate} dan ${endDate} gacha
-qo'shimcha izoh - ${comments || "yo'q"}`;
+    const messageText = `Assalomu aleykum, siz joylagan #YUK-${freight.id} raqamli yuk bo'yicha ${currentUser.first_name} ${currentUser.last_name} quyidagi taklifni beradi:
+
+────────────────────────────
+✅ TAKLIF ETILGAN NARX: 
+   ──────────────────────
+   💰 ${price}
+   ──────────────────────
+
+📅 VAQT JADVALI:
+   ──────────────────────
+   🚚 OLIB KETISH VAQTI: ${startDate}
+   📍 YETKAZIB BERISH VAQTI: ${endDate}
+   ──────────────────────
+
+📝 QO'SHIMCHA IZOH: 
+   ──────────────────────
+   ${commentText}
+   ──────────────────────
+
+Taklifimni ko'rib chiqishingizni so'rayman. Har qanday savol bo'lsa, javob berishga tayyorman.`;
 
     // Create WebSocket connection
-    const ws = new WebSocket(`ws://127.0.0.1/:8000/ws/chat/${token}/`);
+    const ws = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${token}/`);
     
     ws.onopen = () => {
       const messageData = {
@@ -1352,6 +1111,11 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
   };
 
   const handleSubmitOffer = async () => {
+    if (isFreightOwner) {
+      alert('Siz o\'zingizning yukingizga taklif bera olmaysiz');
+      return;
+    }
+
     if (!agreeToGivenPrice && (!offerPrice || isNaN(offerPrice) || parseFloat(offerPrice) <= 0)) {
       alert('Iltimos, narxni to\'g\'ri kiriting');
       return;
@@ -1403,10 +1167,6 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
 
   const handleModalTabChange = (tab) => {
     setActiveModalTab(tab);
-    // Reset map initialization when switching to map tab
-    if (tab === 'map') {
-      setModalMapInitialized(false);
-    }
   };
 
   if (loading) {
@@ -1488,19 +1248,29 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
             </div>
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              <button 
-                onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
-                className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all transform hover:-translate-y-0.5 shadow hover:shadow-xl flex items-center justify-center text-sm sm:text-base"
-              >
-                <FaMessage className="mr-1 sm:mr-2 text-sm" />
-                <span className="truncate">Chat</span>
-              </button>
-              <button 
-                onClick={() => setIsOfferModalOpen(true)}
-                className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:-translate-y-0.5 shadow hover:shadow-xl flex items-center justify-center text-sm sm:text-base"
-              >
-                <span className="truncate">Taklif berish</span>
-              </button>
+              {!isFreightOwner && (
+                <>
+                  <button 
+                    onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
+                    className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all transform hover:-translate-y-0.5 shadow hover:shadow-xl flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <FaMessage className="mr-1 sm:mr-2 text-sm" />
+                    <span className="truncate">Chat</span>
+                  </button>
+                  <button 
+                    onClick={() => setIsOfferModalOpen(true)}
+                    className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:-translate-y-0.5 shadow hover:shadow-xl flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <span className="truncate">Taklif berish</span>
+                  </button>
+                </>
+              )}
+              {isFreightOwner && (
+                <div className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-2.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg shadow-xl flex items-center justify-center text-sm sm:text-base">
+                  <FaUser className="mr-1 sm:mr-2 text-sm" />
+                  <span className="truncate">Bu sizning yukingiz</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1767,85 +1537,9 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
               </div>
             </div>
           </div>
-
-          {/* RIGHT COLUMN */}
-          <div className="space-y-4 sm:space-y-6">
-            {/* Owner Card - Using the new component */}
-            
-
-            {/* Special Requirements Card */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
-                <FaInfoCircle className="mr-2 sm:mr-3 text-purple-600" />
-                Maxsus talablar
-              </h2>
-              
-              <div className="space-y-4 sm:space-y-6">
-                <div className="p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg sm:rounded-xl border border-purple-100">
-                  <div className="flex items-center mb-1 sm:mb-2">
-                    <FaExclamationTriangle className="text-purple-600 mr-1 sm:mr-2 text-sm" />
-                    <p className="text-xs sm:text-sm font-medium text-purple-700">MAXSUS TALABLAR</p>
-                  </div>
-                  <p className="text-gray-700 text-sm sm:text-base">
-                    {freight.special_requirements || "Maxsus talablar mavjud emas"}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-medium text-gray-500 mb-1">STATUS</p>
-                    <div className="flex items-center">
-                      <div className={`w-2 h-2 rounded-full mr-1 sm:mr-2 ${freight.public ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      <p className="font-bold text-gray-800 text-sm sm:text-base">
-                        {freight.public ? 'Ommaviy' : 'Shaxsiy'}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-2 sm:p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs font-medium text-gray-500 mb-1">YETKAZILGAN</p>
-                    <div className="flex items-center">
-                      <div className={`w-2 h-2 rounded-full mr-1 sm:mr-2 ${freight.is_shipped ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                      <p className="font-bold text-gray-800 text-sm sm:text-base">
-                        {freight.is_shipped ? 'Ha' : 'Yo\'q'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Status Timeline */}
-                <div className="pt-3 sm:pt-4 border-t border-gray-100">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
-                    <FaHistory className="mr-1 sm:mr-2 text-blue-600" />
-                    Holat vaqtlari
-                  </h3>
-                  
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex justify-between items-center p-2 sm:p-3 bg-blue-50 rounded-lg">
-                      <span className="text-xs sm:text-sm text-gray-600">Yaratilgan:</span>
-                      <span className="font-semibold text-gray-800 text-xs sm:text-sm">{formatDate(freight.created_at)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg">
-                      <span className="text-xs sm:text-sm text-gray-600">Yangilangan:</span>
-                      <span className="font-semibold text-gray-800 text-xs sm:text-sm">{formatDate(freight.updated_at)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-2 sm:p-3 bg-green-50 rounded-lg">
-                      <span className="text-xs sm:text-sm text-gray-600">Yuklash vaqti:</span>
-                      <span className="font-semibold text-gray-800 text-xs sm:text-sm">{formatDate(freight.route_start_time_from)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-2 sm:p-3 bg-purple-50 rounded-lg">
-                      <span className="text-xs sm:text-sm text-gray-600">Yetkazish vaqti:</span>
-                      <span className="font-semibold text-gray-800 text-xs sm:text-sm">{formatDate(freight.route_end_time_to)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
+
+        
 
         {/* Large Map Container */}
         <div className={`bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-200 mb-6 sm:mb-8 overflow-hidden ${isMapFullscreen ? 'fixed inset-0 z-50 m-0 rounded-none' : ''}`}>
@@ -1927,26 +1621,6 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
                 </div>
               </div>
             )}
-            
-            <div className="absolute top-2 sm:top-4 left-2 sm:left-4 flex flex-col gap-1 sm:gap-2 z-20">
-              <button 
-                onClick={() => map.current?.zoomIn()}
-                className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow flex items-center justify-center hover:bg-gray-100 transition-colors"
-                title="Kattalashtirish"
-              >
-                <FaPlus className="text-gray-700 text-xs sm:text-sm" />
-              </button>
-              <button 
-                onClick={() => map.current?.zoomOut()}
-                className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow flex items-center justify-center hover:bg-gray-100 transition-colors"
-                title="Kichiklashtirish"
-              >
-                <FaMinus className="text-gray-700 text-xs sm:text-sm" />
-              </button>
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full shadow flex items-center justify-center">
-                <span className="text-xs font-bold text-blue-600">{zoomLevel.toFixed(1)}x</span>
-              </div>
-            </div>
           </div>
 
           <div className="px-3 sm:px-4 md:px-6 py-2 sm:py-3 bg-gray-50 border-t border-gray-200">
@@ -1978,20 +1652,33 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
                 <FaArrowLeft className="mr-1 sm:mr-2" />
                 Orqaga qaytish
               </button>
-              <button 
-                onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
-                className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all flex-1 flex items-center justify-center text-sm sm:text-base"
-              >
-                <FaComments className="mr-1 sm:mr-2" />
-                Chat qilish
-              </button>
-              <button 
-                onClick={() => setIsOfferModalOpen(true)}
-                className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all flex-1 flex items-center justify-center text-sm sm:text-base"
-              >
-                <FaCheck className="mr-1 sm:mr-2" />
-                Taklif berish
-              </button>
+              {!isFreightOwner && (
+                <>
+                  {/* <button 
+                    onClick={() => window.location.href = `/messanger?chat=${freight.owner_username}`}
+                    className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all flex-1 flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <FaComments className="mr-1 sm:mr-2" />
+                    Chat qilish
+                  </button> */}
+                  <button 
+                    onClick={() => setIsOfferModalOpen(true)}
+                    className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all flex-1 flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <FaCheck className="mr-1 sm:mr-2" />
+                    Taklif berish
+                  </button>
+                </>
+              )}
+              {isFreightOwner && (
+                <button 
+                  onClick={onBack}
+                  className="px-4 py-2.5 sm:px-5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition-all flex-1 flex items-center justify-center text-sm sm:text-base"
+                >
+                  <FaUser className="mr-1 sm:mr-2" />
+                  Bu sizning yukingiz
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -2005,423 +1692,251 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
             onClick={() => setIsOfferModalOpen(false)}
           />
           
-          <div className="absolute inset-2 sm:inset-4 md:inset-8 lg:inset-12 bg-white rounded-xl sm:rounded-2xl shadow-2xl animate-slideUp flex flex-col overflow-hidden">
-            {/* Modal Header */}
-            <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  <div className="p-1.5 sm:p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg">
-                    <FaPaperPlane className="text-blue-600 text-base sm:text-lg" />
-                  </div>
-                  <div>
-                    <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">Taklif berish</h2>
-                    <p className="text-xs sm:text-sm text-gray-500">Yuk #{freight?.id} uchun taklifingizni yuboring</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsOfferModalOpen(false)}
-                  className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <FaTimes className="text-gray-500 text-base sm:text-lg" />
-                </button>
-              </div>
-
-              {/* Navigation Tabs - Mobile */}
-              <div className="flex border-b border-gray-200 mt-3 sm:mt-4 md:hidden">
-                <button
-                  onClick={() => handleModalTabChange('offer')}
-                  className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'offer' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                >
-                  Taklif
-                </button>
-                <button
-                  onClick={() => handleModalTabChange('map')}
-                  className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'map' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                >
-                  Xarita
-                </button>
-                <button
-                  onClick={() => handleModalTabChange('owner')}
-                  className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'owner' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
-                >
-                  Egasi
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-hidden">
-              <div className="hidden md:grid md:grid-cols-3 h-full divide-x divide-gray-200">
-                {/* Desktop Layout - All 3 columns visible */}
-                
-                {/* Map Section */}
-                <div className="p-3 sm:p-4 h-full flex flex-col">
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
-                      <FaMapPin className="mr-1 sm:mr-2 text-blue-600" />
-                      Joylashuv xaritasi
-                    </h3>
-                    <span className="px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                      {modalRouteDistance ? `${modalRouteDistance} km` : 'Haqiqiy yo\'l'}
-                    </span>
-                  </div>
-                  <div className="flex-1 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 relative min-h-[200px]">
-                    <div 
-                      ref={userMapContainer}
-                      className="w-full h-full"
-                    />
-                    {modalRouteLoading && (
-                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                        <div className="text-center">
-                          <FaSyncAlt className="animate-spin text-blue-600 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2" />
-                          <p className="text-gray-600 text-xs sm:text-sm">Haqiqiy yo'l olinmoqda...</p>
-                        </div>
-                      </div>
-                    )}
-                    {!userLocation && (
-                      <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                        <div className="text-center">
-                          <FaLocationArrow className="text-gray-400 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2 animate-pulse" />
-                          <p className="text-gray-500 text-xs sm:text-sm">Joylashuvingiz aniqlanmoqda...</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-2 sm:mt-3 space-y-1 sm:space-y-2">
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-500 mr-1 sm:mr-2"></div>
-                        <span className="text-gray-600">Yuk joylashuvi</span>
-                      </div>
-                      <div className="flex items-center">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 mr-1 sm:mr-2"></div>
-                        <span className="text-gray-600">Sizning joylashuvingiz</span>
-                      </div>
+          <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl animate-slideUp flex flex-col overflow-hidden w-full max-w-6xl h-[85vh] max-h-[850px]">
+              {/* Modal Header */}
+              <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    <div className="p-1.5 sm:p-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg">
+                      <FaPaperPlane className="text-blue-600 text-base sm:text-lg" />
                     </div>
-                    <div className="text-xs text-gray-500 flex items-center">
-                      <FaRoad className="mr-1 text-purple-600" />
-                      {modalRouteDistance ? `Haqiqiy yo'l: ${modalRouteDistance} km` : "Haqiqiy ko'cha va yo'llar bo'yicha marshrut"}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Offer Form Section */}
-                <div className="p-3 sm:p-4 h-full overflow-y-auto">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
-                    <FaDollarSign className="mr-1 sm:mr-2 text-green-600" />
-                    Taklif ma'lumotlari
-                  </h3>
-                  
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-100">
-                      <div className="flex items-center justify-between mb-2 sm:mb-3">
-                        <div>
-                          <p className="text-xs sm:text-sm font-medium text-gray-500">TAKLIF ETILGAN NARX</p>
-                          <p className="text-lg sm:text-xl font-bold text-gray-800">
-                            {freight && formatCurrency(freight.freight_rate_amount, freight.freight_rate_currency)}
-                          </p>
-                        </div>
-                        <div className="flex items-center">
-                          <FaStar className="text-yellow-500 text-base sm:text-lg" />
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center mb-2 sm:mb-3">
-                        <input
-                          type="checkbox"
-                          id="agreePrice"
-                          checked={agreeToGivenPrice}
-                          onChange={(e) => setAgreeToGivenPrice(e.target.checked)}
-                          className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                        />
-                        <label htmlFor="agreePrice" className="ml-1.5 sm:ml-2 text-xs sm:text-sm text-gray-700">
-                          Taklif etilgan narxni qabul qilaman
-                        </label>
-                      </div>
-                      
-                      {!agreeToGivenPrice && (
-                        <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                            O'z narxingizni kiriting
-                          </label>
-                          <div className="relative">
-                            <FaDollarSign className="absolute left-2 sm:left-3 top-2.5 sm:top-3 text-gray-400 text-sm" />
-                            <input
-                              type="number"
-                              value={offerPrice}
-                              onChange={(e) => setOfferPrice(e.target.value)}
-                              className="w-full pl-7 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
-                              placeholder="Narxni kiriting"
-                              disabled={isSubmitting}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                          <FaCalendarAlt className="inline mr-1 text-blue-500" />
-                          Boshlanish sanasi
-                        </label>
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                          disabled={isSubmitting}
-                          min={new Date().toISOString().split('T')[0]}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                          <FaCalendarAlt className="inline mr-1 text-blue-500" />
-                          Tugash sanasi
-                        </label>
-                        <input
-                          type="date"
-                          value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                          disabled={isSubmitting}
-                          min={startDate || new Date().toISOString().split('T')[0]}
-                        />
-                      </div>
-                    </div>
-
                     <div>
-                      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                        <FaPen className="inline mr-1 text-purple-500" />
-                        Izohlar (Nega men? yoki shartlar)
-                      </label>
-                      <textarea
-                        value={comments}
-                        onChange={(e) => setComments(e.target.value)}
-                        rows="3"
-                        className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-sm sm:text-base"
-                        placeholder="Nega sizni tanlashingiz kerak? Qo'shimcha shartlaringiz bormi?"
-                        disabled={isSubmitting}
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Yuk egasi sizning izohlaringizni ko'radi
-                      </p>
+                      <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800">Taklif berish</h2>
+                      <p className="text-xs sm:text-sm text-gray-500">Yuk #{freight?.id} uchun taklifingizni yuboring</p>
                     </div>
-
-                    <button
-                      onClick={handleSubmitOffer}
-                      disabled={isSubmitting}
-                      className={`w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-2.5 sm:py-3.5 rounded-lg transition-all transform hover:-translate-y-0.5 shadow hover:shadow-lg flex items-center justify-center text-sm sm:text-base ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:from-green-700 hover:to-emerald-700'}`}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <FaSyncAlt className="animate-spin mr-1 sm:mr-2" />
-                          Yuborilmoqda...
-                        </>
-                      ) : (
-                        <>
-                          <FaPaperPlane className="mr-1 sm:mr-2" />
-                          Taklifni yuborish
-                        </>
-                      )}
-                    </button>
                   </div>
+                  <button
+                    onClick={() => setIsOfferModalOpen(false)}
+                    className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <FaTimes className="text-gray-500 text-base sm:text-lg" />
+                  </button>
                 </div>
 
-                {/* Owner Info Section */}
-                <div className="p-3 sm:p-4 h-full overflow-y-auto">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
-                    <FaUserCheck className="mr-1 sm:mr-2 text-purple-600" />
-                    Yuk egasi ma'lumotlari
-                  </h3>
-                  
-                  {freight && (
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border border-blue-100 shadow-sm">
-                        <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 mb-3 sm:mb-4">
-                          <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">
-                            <span className="text-white text-base sm:text-lg md:text-xl font-bold">
-                              {freight.owner_first_name?.[0]}{freight.owner_last_name?.[0]}
-                            </span>
-                          </div>
-                          <div>
-                            <h4 className="text-base sm:text-lg font-bold text-gray-800">
-                              {freight.owner_first_name} {freight.owner_last_name}
-                            </h4>
-                            <div className="flex items-center space-x-1 sm:space-x-2 mt-0.5">
-                              <FaStar className="text-yellow-500 text-xs sm:text-sm" />
-                              <span className="text-xs sm:text-sm text-gray-600">4.8 reyting</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2 sm:space-y-3">
-                          <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                            <FaPhone className="text-blue-500 mr-2 sm:mr-3 text-sm" />
-                            <div>
-                              <p className="text-xs text-gray-500">Telefon raqami</p>
-                              <p className="font-medium text-gray-800 text-sm sm:text-base">{freight.owner_phone || freight.owner_username}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                            <FaUser className="text-purple-500 mr-2 sm:mr-3 text-sm" />
-                            <div>
-                              <p className="text-xs text-gray-500">Foydalanuvchi nomi</p>
-                              <p className="font-medium text-gray-800 text-sm sm:text-base">@{freight.owner_username}</p>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                            <FaCheckCircle className="text-green-500 mr-2 sm:mr-3 text-sm" />
-                            <div>
-                              <p className="text-xs text-gray-500">Holati</p>
-                              <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                Tasdiqlangan foydalanuvchi
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl">
-                        <h5 className="font-medium text-gray-700 mb-1.5 sm:mb-2 text-sm sm:text-base">Yuk haqida qo'shimcha:</h5>
-                        <ul className="space-y-1.5 text-xs sm:text-sm text-gray-600">
-                          <li className="flex items-start">
-                            <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                            <span>To'lov kafolati: {freight.payment_period === 0 ? 'Darhol' : `${freight.payment_period} kun`}</span>
-                          </li>
-                          <li className="flex items-start">
-                            <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                            <span>Yetkazish rejimi: {freight.shipping_mode}</span>
-                          </li>
-                          {freight.insurance_covered && (
-                            <li className="flex items-start">
-                              <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                              <span>Sug'urta mavjud</span>
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
+                {/* Navigation Tabs - Mobile */}
+                <div className="flex border-b border-gray-200 mt-3 sm:mt-4 md:hidden">
+                  <button
+                    onClick={() => handleModalTabChange('offer')}
+                    className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'offer' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                  >
+                    Taklif
+                  </button>
+                  <button
+                    onClick={() => handleModalTabChange('map')}
+                    className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'map' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                  >
+                    Xarita
+                  </button>
+                  <button
+                    onClick={() => handleModalTabChange('owner')}
+                    className={`flex-1 py-2 text-center font-medium text-xs sm:text-sm ${activeModalTab === 'owner' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+                  >
+                    Egasi
+                  </button>
                 </div>
               </div>
 
-              {/* Mobile Layout - Single column with tabs */}
-              <div className="md:hidden h-full">
-                {activeModalTab === 'offer' && (
-                  <div className="p-3 sm:p-4 h-full overflow-y-auto">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
-                      <FaDollarSign className="mr-1 sm:mr-2 text-green-600" />
-                      Taklif ma'lumotlari
-                    </h3>
-                    
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-100">
-                        <div className="flex items-center justify-between mb-2 sm:mb-3">
-                          <div>
-                            <p className="text-xs sm:text-sm font-medium text-gray-500">TAKLIF ETILGAN NARX</p>
-                            <p className="text-lg sm:text-xl font-bold text-gray-800">
-                              {freight && formatCurrency(freight.freight_rate_amount, freight.freight_rate_currency)}
-                            </p>
+              {/* Modal Content */}
+              <div className="flex-1 overflow-hidden">
+                <div className="hidden md:grid md:grid-cols-3 h-full divide-x divide-gray-200">
+                  {/* Desktop Layout - All 3 columns visible */}
+                  
+                  {/* Map Section */}
+                  <div className="flex flex-col h-full">
+                    <div className="p-3 sm:p-4 flex-shrink-0">
+                      <div className="flex items-center justify-between mb-2 sm:mb-3">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
+                          <FaMapPin className="mr-1 sm:mr-2 text-blue-600" />
+                          Joylashuv xaritasi
+                        </h3>
+                        <span className="px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                          {modalRouteDistance ? `${modalRouteDistance} km` : 'Haqiqiy yo\'l'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-1 px-3 sm:px-4 pb-3 sm:pb-4">
+                      <div className="rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 relative h-full">
+                        <div 
+                          ref={userMapContainer}
+                          className="w-full h-full"
+                        />
+                        {modalRouteLoading && (
+                          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                            <div className="text-center">
+                              <FaSyncAlt className="animate-spin text-blue-600 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2" />
+                              <p className="text-gray-600 text-xs sm:text-sm">Haqiqiy yo'l olinmoqda...</p>
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <FaStar className="text-yellow-500 text-base sm:text-lg" />
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center mb-2 sm:mb-3">
-                          <input
-                            type="checkbox"
-                            id="agreePrice"
-                            checked={agreeToGivenPrice}
-                            onChange={(e) => setAgreeToGivenPrice(e.target.checked)}
-                            className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                          />
-                          <label htmlFor="agreePrice" className="ml-1.5 sm:ml-2 text-xs sm:text-sm text-gray-700">
-                            Taklif etilgan narxni qabul qilaman
-                          </label>
-                        </div>
-                        
-                        {!agreeToGivenPrice && (
-                          <div>
-                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                              O'z narxingizni kiriting
-                            </label>
-                            <div className="relative">
-                              <FaDollarSign className="absolute left-2 sm:left-3 top-2.5 sm:top-3 text-gray-400 text-sm" />
-                              <input
-                                type="number"
-                                value={offerPrice}
-                                onChange={(e) => setOfferPrice(e.target.value)}
-                                className="w-full pl-7 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
-                                placeholder="Narxni kiriting"
-                                disabled={isSubmitting}
-                              />
+                        )}
+                        {!userLocation && (
+                          <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                            <div className="text-center">
+                              <FaLocationArrow className="text-gray-400 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2 animate-pulse" />
+                              <p className="text-gray-500 text-xs sm:text-sm">Joylashuvingiz aniqlanmoqda...</p>
                             </div>
                           </div>
                         )}
                       </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                        <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                            <FaCalendarAlt className="inline mr-1 text-blue-500" />
-                            Boshlanish sanasi
-                          </label>
-                          <input
-                            type="date"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                            disabled={isSubmitting}
-                            min={new Date().toISOString().split('T')[0]}
-                          />
+                      <div className="mt-2 sm:mt-3 space-y-1 sm:space-y-2">
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-500 mr-1 sm:mr-2"></div>
+                            <span className="text-gray-600">Yuk joylashuvi</span>
+                          </div>
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 mr-1 sm:mr-2"></div>
+                            <span className="text-gray-600">Sizning joylashuvingiz</span>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                            <FaCalendarAlt className="inline mr-1 text-blue-500" />
-                            Tugash sanasi
-                          </label>
-                          <input
-                            type="date"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-                            disabled={isSubmitting}
-                            min={startDate || new Date().toISOString().split('T')[0]}
-                          />
+                        <div className="text-xs text-gray-500 flex items-center">
+                          <FaRoad className="mr-1 text-purple-600" />
+                          {modalRouteDistance ? `Haqiqiy yo'l: ${modalRouteDistance} km` : "Haqiqiy ko'cha va yo'llar bo'yicha marshrut"}
                         </div>
                       </div>
+                    </div>
+                  </div>
 
-                      <div>
-                        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                          <FaPen className="inline mr-1 text-purple-500" />
-                          Izohlar (Nega men? yoki shartlar)
-                        </label>
-                        <textarea
-                          value={comments}
-                          onChange={(e) => setComments(e.target.value)}
-                          rows="3"
-                          className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-sm sm:text-base"
-                          placeholder="Nega sizni tanlashingiz kerak? Qo'shimcha shartlaringiz bormi?"
-                          disabled={isSubmitting}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Yuk egasi sizning izohlaringizni ko'radi
-                        </p>
+                  {/* Offer Form Section */}
+                  <div className="flex flex-col h-full over">
+                    <div className="p-3 sm:p-4 flex-shrink-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                        <FaDollarSign className="mr-1 sm:mr-2 text-green-600" />
+                        Taklif ma'lumotlari
+                      </h3>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto px-3 sm:px-4 pb-3 sm:pb-4">
+                      <div className="space-y-3 sm:space-y-4">
+                        {isFreightOwner && (
+                          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-yellow-200">
+                            <div className="flex items-center">
+                              <FaExclamationTriangle className="text-yellow-600 mr-2 text-lg" />
+                              <div>
+                                <h4 className="font-bold text-yellow-800 text-sm sm:text-base">Diqqat!</h4>
+                                <p className="text-xs sm:text-sm text-yellow-700 mt-1">
+                                  Siz o'zingizning yukingizga taklif bera olmaysiz
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-100">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3">
+                            <div>
+                              <p className="text-xs sm:text-sm font-medium text-gray-500">TAKLIF ETILGAN NARX</p>
+                              <p className="text-lg sm:text-xl font-bold text-gray-800">
+                                {freight && formatCurrency(freight.freight_rate_amount, freight.freight_rate_currency)}
+                              </p>
+                            </div>
+                            <div className="flex items-center">
+                              <FaStar className="text-yellow-500 text-base sm:text-lg" />
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center mb-2 sm:mb-3">
+                            <input
+                              type="checkbox"
+                              id="agreePrice"
+                              checked={agreeToGivenPrice}
+                              onChange={(e) => setAgreeToGivenPrice(e.target.checked)}
+                              className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                              disabled={isFreightOwner}
+                            />
+                            <label htmlFor="agreePrice" className="ml-1.5 sm:ml-2 text-xs sm:text-sm text-gray-700">
+                              Taklif etilgan narxni qabul qilaman
+                            </label>
+                          </div>
+                          
+                          {!agreeToGivenPrice && (
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                                O'z narxingizni kiriting
+                              </label>
+                              <div className="relative">
+                                <FaDollarSign className="absolute left-2 sm:left-3 top-2.5 sm:top-3 text-gray-400 text-sm" />
+                                <input
+                                  type="number"
+                                  value={offerPrice}
+                                  onChange={(e) => setOfferPrice(e.target.value)}
+                                  className="w-full pl-7 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
+                                  placeholder="Narxni kiriting"
+                                  disabled={isSubmitting || isFreightOwner}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                          <div>
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                              <FaCalendarAlt className="inline mr-1 text-blue-500" />
+                              <span className="font-bold text-green-700">OLIB KETISH VAQTI</span>
+                            </label>
+                            <input
+                              type="date"
+                              value={startDate}
+                              onChange={(e) => setStartDate(e.target.value)}
+                              className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                              disabled={isSubmitting || isFreightOwner}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Yukni olib ketish sanasi</p>
+                          </div>
+                          <div>
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                              <FaCalendarAlt className="inline mr-1 text-blue-500" />
+                              <span className="font-bold text-green-700">YETKAZIB BERISH VAQTI</span>
+                            </label>
+                            <input
+                              type="date"
+                              value={endDate}
+                              onChange={(e) => setEndDate(e.target.value)}
+                              className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                              disabled={isSubmitting || isFreightOwner}
+                              min={startDate || new Date().toISOString().split('T')[0]}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Yukni yetkazish sanasi</p>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <FaPen className="inline mr-1 text-purple-500" />
+                            <span className="font-bold text-green-700">IZOHLAR (Nega men? yoki shartlar)</span>
+                          </label>
+                          <textarea
+                            value={comments}
+                            onChange={(e) => setComments(e.target.value)}
+                            rows="3"
+                            className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-sm sm:text-base"
+                            placeholder="Nega sizni tanlashingiz kerak? Qo'shimcha shartlaringiz bormi?"
+                            disabled={isSubmitting || isFreightOwner}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            Yuk egasi sizning izohlaringizni ko'radi
+                          </p>
+                        </div>
                       </div>
+                    </div>
 
+                    <div className="p-3 sm:p-4 pt-0 flex-shrink-0">
                       <button
                         onClick={handleSubmitOffer}
-                        disabled={isSubmitting}
-                        className={`w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-2.5 sm:py-3.5 rounded-lg transition-all transform hover:-translate-y-0.5 shadow hover:shadow-lg flex items-center justify-center text-sm sm:text-base ${isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:from-green-700 hover:to-emerald-700'}`}
+                        disabled={isSubmitting || isFreightOwner}
+                        className={`w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-2.5 sm:py-3.5 rounded-lg transition-all transform hover:-translate-y-0.5 shadow hover:shadow-lg flex items-center justify-center text-sm sm:text-base ${isSubmitting || isFreightOwner ? 'opacity-70 cursor-not-allowed' : 'hover:from-green-700 hover:to-emerald-700'}`}
                       >
                         {isSubmitting ? (
                           <>
                             <FaSyncAlt className="animate-spin mr-1 sm:mr-2" />
                             Yuborilmoqda...
+                          </>
+                        ) : isFreightOwner ? (
+                          <>
+                            <FaUser className="mr-1 sm:mr-2" />
+                            Bu sizning yukingiz
                           </>
                         ) : (
                           <>
@@ -2432,139 +1947,405 @@ qo'shimcha izoh - ${comments || "yo'q"}`;
                       </button>
                     </div>
                   </div>
-                )}
 
-                {activeModalTab === 'map' && (
-                  <div className="p-3 sm:p-4 h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-2 sm:mb-3">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
-                        <FaMapPin className="mr-1 sm:mr-2 text-blue-600" />
-                        Joylashuv xaritasi
+                  {/* Owner Info Section */}
+                  <div className="flex flex-col h-full">
+                    <div className="p-3 sm:p-4 flex-shrink-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                        <FaUserCheck className="mr-1 sm:mr-2 text-purple-600" />
+                        Yuk egasi ma'lumotlari
                       </h3>
-                      <span className="px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                        {modalRouteDistance ? `${modalRouteDistance} km` : 'Haqiqiy yo\'l'}
-                      </span>
                     </div>
-                    <div className="flex-1 rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 relative min-h-[250px]">
-                      <div 
-                        ref={userMapContainer}
-                        className="w-full h-full"
-                      />
-                      {modalRouteLoading && (
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                          <div className="text-center">
-                            <FaSyncAlt className="animate-spin text-blue-600 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2" />
-                            <p className="text-gray-600 text-xs sm:text-sm">Haqiqiy yo'l olinmoqda...</p>
-                          </div>
-                        </div>
-                      )}
-                      {!userLocation && (
-                        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                          <div className="text-center">
-                            <FaLocationArrow className="text-gray-400 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2 animate-pulse" />
-                            <p className="text-gray-500 text-xs sm:text-sm">Joylashuvingiz aniqlanmoqda...</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-2 sm:mt-3 space-y-1 sm:space-y-2">
-                      <div className="flex items-center justify-between text-xs sm:text-sm">
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-500 mr-1 sm:mr-2"></div>
-                          <span className="text-gray-600">Yuk joylashuvi</span>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 mr-1 sm:mr-2"></div>
-                          <span className="text-gray-600">Sizning joylashuvingiz</span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-gray-500 flex items-center">
-                        <FaRoad className="mr-1 text-purple-600" />
-                        {modalRouteDistance ? `Haqiqiy yo'l: ${modalRouteDistance} km` : "Haqiqiy ko'cha va yo'llar bo'yicha marshrut"}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeModalTab === 'owner' && (
-                  <div className="p-3 sm:p-4 h-full overflow-y-auto">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
-                      <FaUserCheck className="mr-1 sm:mr-2 text-purple-600" />
-                      Yuk egasi ma'lumotlari
-                    </h3>
                     
-                    {freight && (
-                      <div className="space-y-3 sm:space-y-4">
-                        <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-blue-100 shadow-sm">
-                          <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
-                            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">
-                              <span className="text-white text-base sm:text-lg font-bold">
-                                {freight.owner_first_name?.[0]}{freight.owner_last_name?.[0]}
-                              </span>
-                            </div>
-                            <div>
-                              <h4 className="text-base sm:text-lg font-bold text-gray-800">
-                                {freight.owner_first_name} {freight.owner_last_name}
-                              </h4>
-                              <div className="flex items-center space-x-1 sm:space-x-2 mt-0.5">
-                                <FaStar className="text-yellow-500 text-xs sm:text-sm" />
-                                <span className="text-xs sm:text-sm text-gray-600">4.8 reyting</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2 sm:space-y-3">
-                            <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                              <FaPhone className="text-blue-500 mr-2 sm:mr-3 text-sm" />
-                              <div>
-                                <p className="text-xs text-gray-500">Telefon raqami</p>
-                                <p className="font-medium text-gray-800 text-sm sm:text-base">{freight.owner_phone || freight.owner_username}</p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                              <FaUser className="text-purple-500 mr-2 sm:mr-3 text-sm" />
-                              <div>
-                                <p className="text-xs text-gray-500">Foydalanuvchi nomi</p>
-                                <p className="font-medium text-gray-800 text-sm sm:text-base">@{freight.owner_username}</p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
-                              <FaCheckCircle className="text-green-500 mr-2 sm:mr-3 text-sm" />
-                              <div>
-                                <p className="text-xs text-gray-500">Holati</p>
-                                <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                                  Tasdiqlangan foydalanuvchi
+                    <div className="flex-1 overflow-y-auto px-3 sm:px-4 pb-3 sm:pb-4">
+                      {freight && (
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border border-blue-100 shadow-sm">
+                            <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 mb-3 sm:mb-4">
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">
+                                <span className="text-white text-base sm:text-lg md:text-xl font-bold">
+                                  {freight.owner_first_name?.[0]}{freight.owner_last_name?.[0]}
                                 </span>
                               </div>
+                              <div>
+                                <h4 className="text-base sm:text-lg font-bold text-gray-800">
+                                  {freight.owner_first_name} {freight.owner_last_name}
+                                </h4>
+                                <div className="flex items-center space-x-1 sm:space-x-2 mt-0.5">
+                                  <FaStar className="text-yellow-500 text-xs sm:text-sm" />
+                                  <span className="text-xs sm:text-sm text-gray-600">4.8 reyting</span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2 sm:space-y-3">
+                              <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                <FaPhone className="text-blue-500 mr-2 sm:mr-3 text-sm" />
+                                <div>
+                                  <p className="text-xs text-gray-500">Telefon raqami</p>
+                                  <p className="font-medium text-gray-800 text-sm sm:text-base">{freight.owner_phone || freight.owner_username}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                <FaUser className="text-purple-500 mr-2 sm:mr-3 text-sm" />
+                                <div>
+                                  <p className="text-xs text-gray-500">Foydalanuvchi nomi</p>
+                                  <p className="font-medium text-gray-800 text-sm sm:text-base">@{freight.owner_username}</p>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                <FaCheckCircle className="text-green-500 mr-2 sm:mr-3 text-sm" />
+                                <div>
+                                  <p className="text-xs text-gray-500">Holati</p>
+                                  <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                    Tasdiqlangan foydalanuvchi
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-gray-50 p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl">
+                            <h5 className="font-medium text-gray-700 mb-1.5 sm:mb-2 text-sm sm:text-base">Yuk haqida qo'shimcha:</h5>
+                            <ul className="space-y-1.5 text-xs sm:text-sm text-gray-600">
+                              <li className="flex items-start">
+                                <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                <span>To'lov kafolati: {freight.payment_period === 0 ? 'Darhol' : `${freight.payment_period} kun`}</span>
+                              </li>
+                              <li className="flex items-start">
+                                <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                <span>Yetkazish rejimi: {freight.shipping_mode}</span>
+                              </li>
+                              {freight.insurance_covered && (
+                                <li className="flex items-start">
+                                  <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                  <span>Sug'urta mavjud</span>
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-200">
+                            <h5 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">📢 Xabar matni namunasi:</h5>
+                            <div className="text-xs sm:text-sm text-gray-600 bg-white p-2 sm:p-3 rounded-lg border">
+                              <p className="font-medium mb-1">Assalomu aleykum, siz joylagan {freight.id} raqamli yuk bo'yicha...</p>
+                              <p className="text-xs text-gray-500">
+                                Taklifingiz yuqoridagi ma'lumotlar bilan yuk egasiga yuboriladi
+                              </p>
                             </div>
                           </div>
                         </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                        <div className="bg-gray-50 p-2 sm:p-3 rounded-lg sm:rounded-xl">
-                          <h5 className="font-medium text-gray-700 mb-1.5 sm:mb-2 text-sm sm:text-base">Yuk haqida qo'shimcha:</h5>
-                          <ul className="space-y-1.5 text-xs sm:text-sm text-gray-600">
-                            <li className="flex items-start">
-                              <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                              <span>To'lov kafolati: {freight.payment_period === 0 ? 'Darhol' : `${freight.payment_period} kun`}</span>
-                            </li>
-                            <li className="flex items-start">
-                              <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                              <span>Yetkazish rejimi: {freight.shipping_mode}</span>
-                            </li>
-                            {freight.insurance_covered && (
-                              <li className="flex items-start">
-                                <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
-                                <span>Sug'urta mavjud</span>
-                              </li>
+                {/* Mobile Layout - Single column with tabs */}
+                <div className="md:hidden h-full">
+                  {activeModalTab === 'offer' && (
+                    <div className="h-full flex flex-col">
+                      <div className="p-3 sm:p-4 flex-shrink-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                          <FaDollarSign className="mr-1 sm:mr-2 text-green-600" />
+                          Taklif ma'lumotlari
+                        </h3>
+                      </div>
+                      
+                      <div className="flex-1 overflow-y-auto px-3 sm:px-4">
+                        <div className="space-y-3 sm:space-y-4 pb-4">
+                          {isFreightOwner && (
+                            <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-yellow-200">
+                              <div className="flex items-center">
+                                <FaExclamationTriangle className="text-yellow-600 mr-2 text-lg" />
+                                <div>
+                                  <h4 className="font-bold text-yellow-800 text-sm sm:text-base">Diqqat!</h4>
+                                  <p className="text-xs sm:text-sm text-yellow-700 mt-1">
+                                    Siz o'zingizning yukingizga taklif bera olmaysiz
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-100">
+                            <div className="flex items-center justify-between mb-2 sm:mb-3">
+                              <div>
+                                <p className="text-xs sm:text-sm font-medium text-gray-500">TAKLIF ETILGAN NARX</p>
+                                <p className="text-lg sm:text-xl font-bold text-gray-800">
+                                  {freight && formatCurrency(freight.freight_rate_amount, freight.freight_rate_currency)}
+                                </p>
+                              </div>
+                              <div className="flex items-center">
+                                <FaStar className="text-yellow-500 text-base sm:text-lg" />
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center mb-2 sm:mb-3">
+                              <input
+                                type="checkbox"
+                                id="agreePrice"
+                                checked={agreeToGivenPrice}
+                                onChange={(e) => setAgreeToGivenPrice(e.target.checked)}
+                                className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                                disabled={isFreightOwner}
+                              />
+                              <label htmlFor="agreePrice" className="ml-1.5 sm:ml-2 text-xs sm:text-sm text-gray-700">
+                                Taklif etilgan narxni qabul qilaman
+                              </label>
+                            </div>
+                            
+                            {!agreeToGivenPrice && (
+                              <div>
+                                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                                  O'z narxingizni kiriting
+                                </label>
+                                <div className="relative">
+                                  <FaDollarSign className="absolute left-2 sm:left-3 top-2.5 sm:top-3 text-gray-400 text-sm" />
+                                  <input
+                                    type="number"
+                                    value={offerPrice}
+                                    onChange={(e) => setOfferPrice(e.target.value)}
+                                    className="w-full pl-7 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
+                                    placeholder="Narxni kiriting"
+                                    disabled={isSubmitting || isFreightOwner}
+                                  />
+                                </div>
+                              </div>
                             )}
-                          </ul>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                                <FaCalendarAlt className="inline mr-1 text-blue-500" />
+                                <span className="font-bold text-green-700">OLIB KETISH VAQTI</span>
+                              </label>
+                              <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                                disabled={isSubmitting || isFreightOwner}
+                                min={new Date().toISOString().split('T')[0]}
+                              />
+                              <p className="text-xs text-gray-500 mt-1">Yukni olib ketish sanasi</p>
+                            </div>
+                            <div>
+                              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                                <FaCalendarAlt className="inline mr-1 text-blue-500" />
+                                <span className="font-bold text-green-700">YETKAZIB BERISH VAQTI</span>
+                              </label>
+                              <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                                disabled={isSubmitting || isFreightOwner}
+                                min={startDate || new Date().toISOString().split('T')[0]}
+                              />
+                              <p className="text-xs text-gray-500 mt-1">Yukni yetkazish sanasi</p>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                              <FaPen className="inline mr-1 text-purple-500" />
+                              <span className="font-bold text-green-700">IZOHLAR (Nega men? yoki shartlar)</span>
+                            </label>
+                            <textarea
+                              value={comments}
+                              onChange={(e) => setComments(e.target.value)}
+                              rows="3"
+                              className="w-full px-2 sm:px-3 py-2 sm:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none text-sm sm:text-base"
+                              placeholder="Nega sizni tanlashingiz kerak? Qo'shimcha shartlaringiz bormi?"
+                              disabled={isSubmitting || isFreightOwner}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                              Yuk egasi sizning izohlaringizni ko'radi
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
-                )}
+
+                      <div className="p-3 sm:p-4 pt-0 flex-shrink-0">
+                        <button
+                          onClick={handleSubmitOffer}
+                          disabled={isSubmitting || isFreightOwner}
+                          className={`w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold py-2.5 sm:py-3.5 rounded-lg transition-all transform hover:-translate-y-0.5 shadow hover:shadow-lg flex items-center justify-center text-sm sm:text-base ${isSubmitting || isFreightOwner ? 'opacity-70 cursor-not-allowed' : 'hover:from-green-700 hover:to-emerald-700'}`}
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <FaSyncAlt className="animate-spin mr-1 sm:mr-2" />
+                              Yuborilmoqda...
+                            </>
+                          ) : isFreightOwner ? (
+                            <>
+                              <FaUser className="mr-1 sm:mr-2" />
+                              Bu sizning yukingiz
+                            </>
+                          ) : (
+                            <>
+                              <FaPaperPlane className="mr-1 sm:mr-2" />
+                              Taklifni yuborish
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeModalTab === 'map' && (
+                    <div className="h-full flex flex-col">
+                      <div className="p-3 sm:p-4 flex-shrink-0">
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-800 flex items-center">
+                            <FaMapPin className="mr-1 sm:mr-2 text-blue-600" />
+                            Joylashuv xaritasi
+                          </h3>
+                          <span className="px-2 py-0.5 sm:py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                            {modalRouteDistance ? `${modalRouteDistance} km` : 'Haqiqiy yo\'l'}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4">
+                        <div className="rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 relative h-full">
+                          <div 
+                            ref={userMapContainer}
+                            className="w-full h-full"
+                          />
+                          {modalRouteLoading && (
+                            <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                              <div className="text-center">
+                                <FaSyncAlt className="animate-spin text-blue-600 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2" />
+                                <p className="text-gray-600 text-xs sm:text-sm">Haqiqiy yo'l olinmoqda...</p>
+                              </div>
+                            </div>
+                          )}
+                          {!userLocation && (
+                            <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+                              <div className="text-center">
+                                <FaLocationArrow className="text-gray-400 text-xl sm:text-2xl mx-auto mb-1 sm:mb-2 animate-pulse" />
+                                <p className="text-gray-500 text-xs sm:text-sm">Joylashuvingiz aniqlanmoqda...</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2 sm:mt-3 space-y-1 sm:space-y-2">
+                          <div className="flex items-center justify-between text-xs sm:text-sm">
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-500 mr-1 sm:mr-2"></div>
+                              <span className="text-gray-600">Yuk joylashuvi</span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 mr-1 sm:mr-2"></div>
+                              <span className="text-gray-600">Sizning joylashuvingiz</span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-gray-500 flex items-center">
+                            <FaRoad className="mr-1 text-purple-600" />
+                            {modalRouteDistance ? `Haqiqiy yo'l: ${modalRouteDistance} km` : "Haqiqiy ko'cha va yo'llar bo'yicha marshrut"}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeModalTab === 'owner' && (
+                    <div className="h-full flex flex-col">
+                      <div className="p-3 sm:p-4 flex-shrink-0">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center">
+                          <FaUserCheck className="mr-1 sm:mr-2 text-purple-600" />
+                          Yuk egasi ma'lumotlari
+                        </h3>
+                      </div>
+                      
+                      <div className="flex-1 overflow-y-auto px-3 sm:px-4 pb-4">
+                        {freight && (
+                          <div className="space-y-3 sm:space-y-4">
+                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-blue-100 shadow-sm">
+                              <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-4">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow">
+                                  <span className="text-white text-base sm:text-lg font-bold">
+                                    {freight.owner_first_name?.[0]}{freight.owner_last_name?.[0]}
+                                  </span>
+                                </div>
+                                <div>
+                                  <h4 className="text-base sm:text-lg font-bold text-gray-800">
+                                    {freight.owner_first_name} {freight.owner_last_name}
+                                  </h4>
+                                  <div className="flex items-center space-x-1 sm:space-x-2 mt-0.5">
+                                    <FaStar className="text-yellow-500 text-xs sm:text-sm" />
+                                    <span className="text-xs sm:text-sm text-gray-600">4.8 reyting</span>
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="space-y-2 sm:space-y-3">
+                                <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                  <FaPhone className="text-blue-500 mr-2 sm:mr-3 text-sm" />
+                                  <div>
+                                    <p className="text-xs text-gray-500">Telefon raqami</p>
+                                    <p className="font-medium text-gray-800 text-sm sm:text-base">{freight.owner_phone || freight.owner_username}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                  <FaUser className="text-purple-500 mr-2 sm:mr-3 text-sm" />
+                                  <div>
+                                    <p className="text-xs text-gray-500">Foydalanuvchi nomi</p>
+                                    <p className="font-medium text-gray-800 text-sm sm:text-base">@{freight.owner_username}</p>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center p-2 sm:p-3 bg-white rounded-lg border border-gray-100">
+                                  <FaCheckCircle className="text-green-500 mr-2 sm:mr-3 text-sm" />
+                                  <div>
+                                    <p className="text-xs text-gray-500">Holati</p>
+                                    <span className="px-1.5 sm:px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                      Tasdiqlangan foydalanuvchi
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                              <h5 className="font-medium text-gray-700 mb-1.5 sm:mb-2 text-sm sm:text-base">Yuk haqida qo'shimcha:</h5>
+                              <ul className="space-y-1.5 text-xs sm:text-sm text-gray-600">
+                                <li className="flex items-start">
+                                  <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                  <span>To'lov kafolati: {freight.payment_period === 0 ? 'Darhol' : `${freight.payment_period} kun`}</span>
+                                </li>
+                                <li className="flex items-start">
+                                  <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                  <span>Yetkazish rejimi: {freight.shipping_mode}</span>
+                                </li>
+                                {freight.insurance_covered && (
+                                  <li className="flex items-start">
+                                    <FaCheckCircle className="text-green-500 mr-1.5 sm:mr-2 mt-0.5 shrink-0 text-xs" />
+                                    <span>Sug'urta mavjud</span>
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+
+                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-green-200">
+                              <h5 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">📢 Xabar matni namunasi:</h5>
+                              <div className="text-xs sm:text-sm text-gray-600 bg-white p-2 sm:p-3 rounded-lg border">
+                                <p className="font-medium mb-1">Assalomu aleykum, siz joylagan {freight.id} raqamli yuk bo'yicha...</p>
+                                <p className="text-xs text-gray-500">
+                                  Taklifingiz yuqoridagi ma'lumotlar bilan yuk egasiga yuboriladi
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

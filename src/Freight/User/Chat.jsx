@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react"
 import { FaPaperPlane, FaUserCircle, FaUser, FaClock, FaCheck, FaCheckDouble, FaArrowLeft } from "react-icons/fa"
 
-const BASE_WEBSOCKET_URL = 'ws://127.0.0.1/:8000/ws/'
-const BASE_HTTP_URL = 'http://127.0.0.1/:8000/api/'
+const BASE_WEBSOCKET_URL = 'ws://127.0.0.1:8000/ws/'
+const BASE_HTTP_URL = 'http://127.0.0.1:8000/api/'
 
 const Chat = ({ username, isMobile, onBack }) => {
     const [messages, setMessages] = useState([])
@@ -151,7 +151,7 @@ const Chat = ({ username, isMobile, onBack }) => {
     return (
         <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-blue-50">
             {/* Desktop Chat Header */}
-            {!isMobile && (
+            {/* {!isMobile && (
                 <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
@@ -175,7 +175,7 @@ const Chat = ({ username, isMobile, onBack }) => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {/* Messages Container */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
